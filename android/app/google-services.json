@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1032051706704",
+    "project_id": "aqary-73d78",
+    "storage_bucket": "aqary-73d78.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032051706704:android:109c8f8d1c8a54c98d7a55",
+        "android_client_info": {
+          "package_name": "com.mks.aqary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcqpMNFwRJUOr8DyUADsLQBd8G2ZKE_Gk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
