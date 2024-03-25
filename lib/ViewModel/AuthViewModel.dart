@@ -1,4 +1,5 @@
 
+import 'package:aqary/data/services/FiresbaseServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,10 +41,19 @@ class AuthViewModel {
   Future<String?> login(String phone, String firebaseId) async {
     RequestHandler requestHandler = RequestHandler();
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    FirebaseServices services = FirebaseServices();
+
     String? token;
+    String? deviceToken;
+
+    deviceToken = await services.getFCMToken();
+    await prefs.setString('deviceToken', deviceToken!);
+
+
     Map<String, String> data = {
       "phone": phone,
-      'firebaseId': firebaseId,
+      'firebase_id': firebaseId,
+      'device_token': deviceToken,
     };
     Map? responseModel = await requestHandler.postData(
         endPoint: '/auth',
@@ -53,6 +63,7 @@ class AuthViewModel {
 
     token = responseModel["token"];
     await prefs.setString('token', token!);
+
     return token;
   }
 }

@@ -70,6 +70,7 @@ dependencies:
   pay: ^2.0.0
   pinput: ^4.0.0
   country_code_picker: ^3.0.0
+  shimmer: ^3.0.0
 
 
 

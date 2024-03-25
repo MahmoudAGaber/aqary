@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/services/FirestoreServices.dart';
+import '../data/services/FiresbaseServices.dart';
 
 final localImage = StateProvider<String>((ref) => "");
 

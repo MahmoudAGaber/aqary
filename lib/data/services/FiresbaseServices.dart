@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../Models/ChatModel.dart';
 
@@ -13,8 +14,21 @@ class FirebaseServices {
   final CollectionReference chatRooms = FirebaseFirestore.instance.collection('chatRooms');
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   static final FirebaseStorage storage = FirebaseStorage.instance;
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
 
+
+  Future<String?> getFCMToken() async {
+    String? fcmToken;
+
+    try {
+      fcmToken = await messaging.getToken();
+    } catch (e) {
+      print('Error getting FCM token: $e');
+    }
+
+    return fcmToken;
+  }
 
 
   Future<String> createChatRoom(String currentUserId, String senderId, Map<String, dynamic> initialMessage) async {

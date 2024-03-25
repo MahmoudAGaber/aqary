@@ -1,4 +1,4 @@
-import '../data/model/response/language_model.dart';
+import '../Models/language_model.dart';
 import '../helper/app_mode.dart';
 import 'images.dart';
 

@@ -2,7 +2,7 @@
 
 import 'package:aqary/Models/ChatModel.dart';
 import 'package:aqary/Views/Chat/ChatScreen.dart';
-import 'package:aqary/data/services/FirestoreServices.dart';
+import 'package:aqary/data/services/FiresbaseServices.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

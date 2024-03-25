@@ -170,7 +170,7 @@ class _LoginState extends ConsumerState<Login> {
                                                 verificationCompleted:(AuthCredential credential) {},
                                                   verificationFailed: (FirebaseAuthException e) {
                                                   print("HIIII${e.code}");
-                                                    if (e.code == 'invalid-phone-number') {
+                                                    if (e.code == 'invalid-phone-number' || e.code =='missing-client-identifier') {
                                                       ref.read(loadingState.notifier).state = false;
                                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("رقم الهاتف غير صحيح. الرجاء التحقق من صحة الرقم المدخل",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey),)));
                                                     } else {
@@ -249,7 +249,7 @@ class _LoginState extends ConsumerState<Login> {
 
     if (numericValue == null || numericValue.isEmpty) {
       return 'الرقم الهاتفي مطلوب';
-    } else if (numericValue.length < 10) {
+    } else if (numericValue.length < 8) {
       return 'يجب أن يكون رقم الهاتف على الأقل ١٠ أرقام';
     }
 

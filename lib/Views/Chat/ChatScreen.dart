@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:aqary/Models/ChatModel.dart';
 import 'package:aqary/Views/base/custom_imageView.dart';
 import 'package:aqary/Views/base/custom_text_field.dart';
-import 'package:aqary/data/services/FirestoreServices.dart';
+import 'package:aqary/data/services/FiresbaseServices.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
