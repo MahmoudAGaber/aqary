@@ -28,11 +28,12 @@ class _SplachScreenState extends ConsumerState<SplachScreen> {
       var auth =  ref.watch(authStateProvider.future);
 
       Timer(Duration(seconds: 3), () async{
-          await  ref.watch(locationProvider.notifier).getCurrentLocation();
+          await  ref.watch(estatelocationProvider.notifier).getCurrentEstateLocation();
+          await  ref.watch(userLocationProvider.notifier).getCurrentUserLocation();
 
        auth.then((user) {
           user != null
-              ?Navigator.push(context, MaterialPageRoute(builder: (context)=>Homepage()))
+              ?Navigator.push(context, MaterialPageRoute(builder: (context)=>Homepage(page: 0,)))
              : Navigator.push(context, MaterialPageRoute(builder: (context)=>Login()));
 
        });

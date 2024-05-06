@@ -1,10 +1,15 @@
 
+import 'package:aqary/data/services/FiresbaseServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../Models/ChatModel.dart';
 
+final isSearchTapProvider = StateProvider<bool>((ref) => false);
+
 final messagesProvider = StateNotifierProvider<MessagesNotifier , List<Message>>((ref) => MessagesNotifier(ref));
+
+final searchUserProvider = StateNotifierProvider<searchUserNotifier , List<DocumentSnapshot>>((ref) => searchUserNotifier(ref));
 
 class MessagesNotifier extends StateNotifier<List<Message>> {
   Ref ref;
@@ -38,6 +43,21 @@ class MessagesNotifier extends StateNotifier<List<Message>> {
     }
 
     print("Length${state.length}");
+  }
+}
+
+
+
+class searchUserNotifier extends StateNotifier<List<DocumentSnapshot>>{
+  Ref ref;
+  searchUserNotifier(this.ref):super([]);
+  FirebaseServices firebaseServices = FirebaseServices();
+
+  Future<void> filterUsers(String searchKey) async{
+    List<DocumentSnapshot> users = [];
+    users = await firebaseServices.searchUsers(searchKey);
+
+    state = users;
   }
 }
 

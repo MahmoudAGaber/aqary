@@ -2,21 +2,25 @@
 
 import 'package:aqary/Views/base/custom_app_bar.dart';
 import 'package:aqary/Views/base/custom_button.dart';
+import 'package:aqary/helper/payment_helper.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:signature/signature.dart';
 
+import '../../../ViewModel/ContractViewModel.dart';
+import '../../../utill/Utils.dart';
 import 'SignatureDetailScreen.dart';
 
-class SignaturePad extends StatefulWidget {
+class SignaturePad extends ConsumerStatefulWidget {
   const SignaturePad({super.key});
 
   @override
-  State<SignaturePad> createState() => _SignaturePadState();
+  ConsumerState<SignaturePad> createState() => _SignaturePadState();
 }
 
-class _SignaturePadState extends State<SignaturePad> {
+class _SignaturePadState extends ConsumerState<SignaturePad> {
   SignatureController signatureController = SignatureController();
 
   @override
@@ -127,24 +131,21 @@ class _SignaturePadState extends State<SignaturePad> {
                             Orientation.landscape;
 
                         if (signatureController.isNotEmpty) {
-                          // final signature = await Utils.exportSignature(
-                          //   signatureController: signatureController,
-                          //   penColor: Colors.grey[900]!,
-                          // );
-
+                          final signature = await Utils.exportSignature(
+                            signatureController: signatureController,
+                            penColor: Colors.grey[900]!,
+                          );
                           if (isLanscape) {
                             // Set orientation to potrait Up
                             SystemChrome.setPreferredOrientations(
                               [DeviceOrientation.portraitUp],
                             );
                           }
+                        //  PaymentHelper.uint8ListToFile(signature);
+                          ref.read(signatureProvider.notifier).getSignature(signature);
+                         // Navigator.push(context, MaterialPageRoute(builder: (context)=> SignatureDetailScreen(signature: ref.watch(signatureProvider).data!)));
 
-                          // await Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) =>
-                          //         SignatureDetailScreen(signature: signature),
-                          //   ),
-                          // );
+                           Navigator.pop(context);
 
                           signatureController.clear();
                         }

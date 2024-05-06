@@ -32,6 +32,8 @@ class Message{
   String? messageType;
   bool? seen;
   String? senderID;
+  String? senderName;
+  String? pic;
 
   Message({ this.message,  this.messageDate,  this.messageId,  this.messageType,
      this.seen, this.senderID});

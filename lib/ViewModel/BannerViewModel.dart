@@ -26,7 +26,12 @@ class BannerNotifier extends StateNotifier<StateModel<List<BannerModel>>>{
         auth: true,
         fromJson: (json) => BannerModel.listFromJson(json),
       );
-      state = StateModel.success(banners);
+      if(banners.isEmpty){
+        state = StateModel.empty();
+      }else{
+        state = StateModel.success(banners);
+
+      }
     } catch (e) {
       state = StateModel.fail("Error in data");
     }

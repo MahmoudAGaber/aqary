@@ -30,7 +30,7 @@ class Styles {
           onPrimary: Color(0xffffdc73),
           secondary: Colors.orange,
           onSecondary: Colors.pink,
-          error: Color(0xffDCDBDB),
+          error: Colors.red,
           onError: Colors.red,
           background: Colors.white,
           onBackground: Colors.black45,

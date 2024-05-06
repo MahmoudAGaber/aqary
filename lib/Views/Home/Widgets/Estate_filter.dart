@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../ViewModel/CategoryViewModel.dart';
+import '../../../helper/ShimmerWidget.dart';
 import '../../../utill/dimensions.dart';
 import 'Estate_card.dart';
 
@@ -23,8 +24,10 @@ class _EstateFilterState extends ConsumerState<EstateFilter> {
   Widget build(BuildContext context) {
     var categories  = ref.watch(categoryProvider);
 
-    return  categories.handelState<CategoryModel>(
-      onLoading: (state) => Center(child: SizedBox(height:30,width:30,child: CircularProgressIndicator(color: Colors.grey,))),
+    return categories.handelState<CategoryModel>(
+        onLoading: (state) => SizedBox(
+            height: 120,
+            child: ShimmerList("Banner")),
         onSuccess: (state) => Column(
           children: [
             SizedBox(
@@ -41,7 +44,7 @@ class _EstateFilterState extends ConsumerState<EstateFilter> {
               ),
             ),
             SizedBox(height: Dimensions.paddingSizeDefault,),
-            EstateCard(),
+            EstateCard(properties:categories.data![ref.watch(categorySelected)].properties),
           ],
         ),
         onFailure: (state) => Center(child: Container(child: Text("shit")),)
@@ -52,14 +55,16 @@ class _EstateFilterState extends ConsumerState<EstateFilter> {
     return Consumer(
       builder: (context, ref, child){
         return InkWell(
-          onTap: (){},
+          onTap: (){
+            ref.read(categorySelected.notifier).state = index;
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             child: Container(
                 width: 107,
                 height: 42,
                 decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
+                   color: ref.read(categorySelected) == index ? Theme.of(context).primaryColor : null,
                     border: Border.all(
                       color:Theme.of(context).primaryColor,
                     ),
@@ -67,7 +72,7 @@ class _EstateFilterState extends ConsumerState<EstateFilter> {
                 ),
                 child: Center(
                   child: Text(tag,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white,)),
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ref.read(categorySelected) == index ? Colors.white :Colors.black ,)),
                 )
             ),
           ),

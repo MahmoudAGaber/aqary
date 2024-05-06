@@ -48,6 +48,10 @@ class DateConverter {
     return DateFormat('dd MMM yyyy').format(isoStringToLocalDate(dateTime));
   }
 
+  static String isoStringToLocalDateOnly2(String dateTime) {
+    return DateFormat('dd/MM/yyyy').format(isoStringToLocalDate(dateTime));
+  }
+
     static String localDateToIsoString(DateTime dateTime) {
     return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').format(dateTime.toUtc());
   }
@@ -68,6 +72,37 @@ class DateConverter {
   static String _timeFormatter(BuildContext context) {
    // return Provider.of<SplashProvider>(context, listen: false).configModel!.timeFormat == '24' ? 'HH:mm' : 'hh:mm a';
     return  'HH:mm' ;
+  }
+
+  static String timeAgoSinceDate(DateTime dateTime, {bool numericDates = true}) {
+    final date2 = DateTime.now();
+    final difference = date2.difference(dateTime);
+
+    if (difference.inDays > 8) {
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    } else if ((difference.inDays / 7).floor() >= 1) {
+      return (numericDates) ? '1 اسبوع' : 'الاسبوع الماضي';
+    } else if (difference.inDays >= 2) {
+      return '${difference.inDays} يوم';
+    } else if (difference.inDays >= 1) {
+      return (numericDates) ? '1 يوم ' : 'امس';
+    } else if (difference.inHours >= 2) {
+      return '${difference.inHours} ساعه ';
+    } else if (difference.inHours >= 1) {
+      return (numericDates) ? '1 ساعه ' : 'من ساعه';
+    } else if (difference.inMinutes >= 2) {
+      return '${difference.inMinutes} ق';
+    } else if (difference.inMinutes >= 1) {
+      return (numericDates) ? '1 ق' : 'من دقيقه';
+    } else if (difference.inSeconds >= 3) {
+      return '${difference.inSeconds} ثانيه';
+    } else {
+      return 'Just now';
+    }
+  }
+
+  static dynamic numberFormat(dynamic number){
+   return NumberFormat('#,##0', 'en_US').format(number);
   }
 
 }

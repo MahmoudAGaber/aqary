@@ -4,23 +4,31 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../../utill/dimensions.dart';
+import '../../../Models/CategoryModel.dart';
+import '../../../Models/RealStateModel.dart';
+import '../../../ViewModel/CategoryViewModel.dart';
+import '../../../ViewModel/FavoritesViewModel.dart';
 import '../../Home/Widgets/EstateDetails.dart';
 
-class FavouriteItem extends StatelessWidget {
-  FavouriteItem({super.key});
+class FavouriteItem extends ConsumerWidget {
+  List<RealStateModel>? properties;
+  FavouriteItem({super.key,this.properties});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
-        itemCount: searchImage.length,
+        itemCount: properties!.length,
         scrollDirection: Axis.vertical,
         physics: ScrollPhysics(),
         itemBuilder: (context,index){
+          var item = properties![index];
           return Dismissible(
             key: Key("unique_key"),
             direction: DismissDirection.endToStart,
@@ -48,13 +56,14 @@ class FavouriteItem extends StatelessWidget {
                       children: [
                         InkWell(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>EstateDetails()));
-
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>EstateDetails(propertyId: item.id!,)));
                           },
                           child: ClipRRect(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
-                            child: Image.asset(
-                              "assets/images/estate1.png",
+                            child: item.images.isEmpty
+                                ?SizedBox( width: 154, height: 107,)
+                                :Image.network(
+                              "${item.images.first.path}",
                               width: 154,
                               height: 107,
                               fit: BoxFit.cover ,
@@ -62,48 +71,51 @@ class FavouriteItem extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("شقه للايجار في الشامخه", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600)),
-                              Row(
-                                children: [
-                                  Text("1", style: Theme.of(context).textTheme.bodySmall!.copyWith()),
-                                  SizedBox(width: 4,),
-                                  SvgPicture.asset("assets/images/bathroom.svg",color: Colors.grey,height: 16,),
-                                  SizedBox(width: Dimensions.paddingSizeDefault,),
-                                  Text("2", style: Theme.of(context).textTheme.bodySmall!.copyWith()),
-                                  SizedBox(width: 4,),
-                                  SvgPicture.asset("assets/images/bed.svg",color: Colors.grey,height: 16,),
+                          padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 2),
+                          child: SizedBox(
+                            height: 100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("${item.title}", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600)),
+                                Row(
+                                  children: [
+                                    Text("${item.bathroomsCount}", style: Theme.of(context).textTheme.bodySmall!.copyWith()),
+                                    SizedBox(width: 4,),
+                                    SvgPicture.asset("assets/images/bathroom.svg",color: Colors.grey,height: 16,),
+                                    SizedBox(width: Dimensions.paddingSizeDefault,),
+                                    Text("${item.bedroomsCount}", style: Theme.of(context).textTheme.bodySmall!.copyWith()),
+                                    SizedBox(width: 4,),
+                                    SvgPicture.asset("assets/images/bed.svg",color: Colors.grey,height: 16,),
 
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on,
-                                    color: Colors.grey,
-                                    size: 14,
-                                  ),
-                                  SizedBox(
-                                    width: Dimensions.paddingSizeExtraSmall,
-                                  ),
-                                  Text(
-                                    "الشامخه, أبوظبي",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
-                                        .copyWith(fontSize: 10),
-                                  ),
-                                ],
-                              ),
-                              Text("30,000 درهم / سنويا", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: Colors.grey,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Dimensions.paddingSizeExtraSmall,
+                                    ),
+                                    Text(
+                                      "${item.country}, ${item.city}",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                                Text("${item.yearPrice} درهم / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
 
 
 
-                            ],
+                              ],
+                            ),
                           ),
                         )
                       ],
@@ -124,9 +136,14 @@ class FavouriteItem extends StatelessWidget {
                             )
                           ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: SvgPicture.asset("assets/images/heart2.svg",color: Colors.red,
+                        child: InkWell(
+                          onTap: (){
+                            ref.read(favoritesProvider.notifier).addFavorite(properties![index].id!);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: SvgPicture.asset("assets/images/heart2.svg",color: item.isFavorite!? Colors.red : null,
+                            ),
                           ),
                         ),
                       ),

@@ -71,6 +71,8 @@ dependencies:
   pinput: ^4.0.0
   country_code_picker: ^3.0.0
   shimmer: ^3.0.0
+  video_player: ^2.8.5
+  flutter_spinkit: ^5.2.1
 
 
 
@@ -126,6 +128,10 @@ flutter:
           - asset: assets/fonts/Tajawal-Bold.ttf
           - asset: assets/fonts/NotoSansArabic-Bold.ttf
           - asset: assets/fonts/NotoSansArabic-Regular.ttf
+          - asset: assets/fonts/Roboto-Regular.ttf
+          - asset: assets/fonts/Amiri-Bold.ttf
+          - asset: assets/fonts/Amiri-Regular.ttf
+
 
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic

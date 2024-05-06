@@ -17,7 +17,8 @@ import '../../helper/file_picker.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   String chatRoomId;
-   ChatScreen({super.key,required this.chatRoomId});
+  String? senderName;
+   ChatScreen({super.key,required this.chatRoomId,this.senderName});
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();

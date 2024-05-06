@@ -5,6 +5,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../helper/ShimmerWidget.dart';
+
 class Banners extends ConsumerStatefulWidget {
    Banners({super.key});
 
@@ -25,7 +27,9 @@ class _BannersState extends ConsumerState<Banners> {
   Widget build(BuildContext context) {
     var banners = ref.watch(bannerProvider);
     return banners.handelState<BannerModel>(
-        onLoading: (state) => Center(child: SizedBox(height:30,width:30,child: CircularProgressIndicator(color: Colors.grey,))),
+        onLoading: (state) => SizedBox(
+            height: 120,
+            child: ShimmerList("Banner")),
        onSuccess: (state) => CarouselSlider.builder(
          itemCount:  banners.data!.length,
          options: CarouselOptions(
@@ -44,7 +48,7 @@ class _BannersState extends ConsumerState<Banners> {
                width: MediaQuery.of(context).size.width,
                child: ClipRRect(
                  borderRadius: BorderRadius.circular(10),
-                 child: Image.asset(
+                 child: Image.network(
                    banners.data![index].image,
                    fit: BoxFit.cover,
                  ),

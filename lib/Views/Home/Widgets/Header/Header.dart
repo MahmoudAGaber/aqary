@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:aqary/Views/Home/MapView.dart';
+import 'package:aqary/Views/Home/Widgets/Header/SearchByLocation.dart';
 import 'package:aqary/Views/base/custom_text_field.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,10 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../../ViewModel/LocationViewModel.dart';
-import 'EstateOwner.dart';
-import 'Notification.dart';
-import 'Search/Search.dart';
+import '../../../../ViewModel/LocationViewModel.dart';
+import '../EstateOwner.dart';
+import '../Notification.dart';
+import '../Search/Search.dart';
 
 class Header extends ConsumerStatefulWidget {
   const Header({super.key});
@@ -23,6 +24,7 @@ class Header extends ConsumerStatefulWidget {
 
 class _HeaderState extends ConsumerState<Header> {
 
+  FocusNode textFocusNode = FocusNode();
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   List<Marker> markers = [
     Marker(markerId: MarkerId("1"),
@@ -37,7 +39,7 @@ class _HeaderState extends ConsumerState<Header> {
   }
   @override
   Widget build(BuildContext context) {
-    var currentLocation = ref.watch(locationProvider);
+    var currentLocation = ref.watch(userLocationProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 20,right: Dimensions.paddingSizeDefault,left: Dimensions.paddingSizeDefault),
       child: Column(
@@ -62,7 +64,8 @@ class _HeaderState extends ConsumerState<Header> {
                       ),
                       InkWell(
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> MapView()));
+                          //Navigator.push(context, MaterialPageRoute(builder: (context)=> MapView()));
+                          SearchByLocation().searchByLocation(context);
                         },
                         child: Icon(
                           Icons.arrow_drop_down,
@@ -72,26 +75,32 @@ class _HeaderState extends ConsumerState<Header> {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Theme.of(context).primaryColor,
-                        size: 18,
-                      ),
-                      SizedBox(
-                        width: Dimensions.paddingSizeExtraSmall,
-                      ),
-                      currentLocation != null ?
-                      Text(
-                        "${currentLocation.placemark!.administrativeArea}",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall!
-                            .copyWith(fontSize: 15),
-                        overflow: TextOverflow.clip,
-                      ):SizedBox(),
-                    ],
+                  InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> MapView(lat:LatLng(currentLocation!.latitude!,currentLocation.longtude!),title: 'حدد الموقع الذي تريده ',isSelected: true, isUserLocation: true,)));
+
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: Theme.of(context).primaryColor,
+                          size: 18,
+                        ),
+                        SizedBox(
+                          width: Dimensions.paddingSizeExtraSmall,
+                        ),
+                        currentLocation != null ?
+                        Text(
+                          "${currentLocation.placemark!.administrativeArea}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(fontSize: 15),
+                          overflow: TextOverflow.clip,
+                        ):SizedBox(),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -182,6 +191,7 @@ class _HeaderState extends ConsumerState<Header> {
             isSearch: true,
             isShowBorder: true,
             onTap: (){
+              FocusScope.of(context).requestFocus(textFocusNode);
               Navigator.push(context, MaterialPageRoute(builder: (context)=>Search()));
             },
           )

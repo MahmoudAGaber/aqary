@@ -1,23 +1,42 @@
 
 import 'package:aqary/Views/Profile/Settings.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
+import 'package:aqary/data/StateModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../Models/RealStateModel.dart';
+import '../../Models/UserModel.dart';
+import '../../ViewModel/UserViewModel.dart';
+import '../../helper/ShimmerWidget.dart';
 import '../../utill/dimensions.dart';
 import '../base/custom_button.dart';
 import '../base/custom_dialog.dart';
 
-class AddHousingOffical extends StatefulWidget {
+class AddHousingOffical extends ConsumerStatefulWidget {
   const AddHousingOffical({super.key});
 
   @override
-  State<AddHousingOffical> createState() => _AddHousingOfficalState();
+  ConsumerState<AddHousingOffical> createState() => _AddHousingOfficalState();
 }
 
-class _AddHousingOfficalState extends State<AddHousingOffical> {
+class _AddHousingOfficalState extends ConsumerState<AddHousingOffical> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController nameEditingController = TextEditingController();
+  TextEditingController phoneEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(UserPropProvider.notifier).getUserProp(UserProp.all);
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+    var userProp = ref.watch(UserPropProvider);
+    var addEstateToManage = ref.watch(EstateManagerProvider);
     return Scaffold(
       appBar: CustomAppBar(
         title: "إضافة مسئول سكن",
@@ -25,165 +44,182 @@ class _AddHousingOfficalState extends State<AddHousingOffical> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-          child: Column(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Text("بيانات الوسيط",style: Theme.of(context).textTheme.titleLarge!),
-                  ),
-                  SizedBox(height: Dimensions.paddingSizeDefault,),
-                  TextFormField(
-                    //  controller: searchController,
-                    textDirection: TextDirection.rtl,
-                    cursorColor: Colors.grey,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        fillColor: Color(0xFFF9FAFA),
-                        filled: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                        hintText: "الاسم بالكامل",
-                        hintStyle: TextStyle(color: Colors.grey,fontSize: 14),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color(0xFFF9FAFA),
-                            )
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor
-                            )
-                        )
-                    ),
-                    onTap: (){
-
-                    },
-                    onChanged: (value){
-
-                    },
-                  ),
-                  SizedBox(height: Dimensions.paddingSizeDefault,),
-                  TextFormField(
-                    //  controller: searchController,
-                    textDirection: TextDirection.rtl,
-                    cursorColor: Colors.grey,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        fillColor: Color(0xFFF9FAFA),
-                        filled: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                        hintText: "رقم الهاتف",
-                        hintStyle: TextStyle(color: Colors.grey,fontSize: 14),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color(0xFFF9FAFA),
-                            )
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor
-                            )
-                        )
-                    ),
-                    onTap: (){
-
-                    },
-                    onChanged: (value){
-
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: Dimensions.paddingSizeExtraLarge,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: Row(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("تحديد العقار",style: Theme.of(context).textTheme.titleLarge!),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Text("بيانات الوسيط",style: Theme.of(context).textTheme.titleLarge!),
+                    ),
+                    SizedBox(height: Dimensions.paddingSizeDefault,),
+                    TextFormField(
+                      controller: nameEditingController,
+                      textDirection: TextDirection.rtl,
+                      cursorColor: Colors.grey,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                          fillColor: Color(0xFFF9FAFA),
+                          filled: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                          hintText: "الاسم بالكامل",
+                          hintStyle: TextStyle(color: Colors.grey,fontSize: 14),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color(0xFFF9FAFA),
+                              )
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColor
+                              )
+                          )
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'قم بادخال الاسم';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: Dimensions.paddingSizeDefault,),
+                    TextFormField(
+                      controller: phoneEditingController,
+                      textDirection: TextDirection.rtl,
+                      cursorColor: Colors.grey,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                          fillColor: Color(0xFFF9FAFA),
+                          filled: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                          hintText: "رقم الهاتف",
+                          hintStyle: TextStyle(color: Colors.grey,fontSize: 14),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color(0xFFF9FAFA),
+                              )
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColor
+                              )
+                          )
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'قم بادخال رقم الهاتف';
+                        }
+                        return null;
+                      },
+                    ),
                   ],
                 ),
-
-              ),
-              SizedBox(height: Dimensions.paddingSizeDefault,),
-              GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // number of items in each row
-                      mainAxisSpacing: 2.0, // spacing between rows
-                      crossAxisSpacing: 2.0, // spacing between columns
-                      mainAxisExtent: 250
+                SizedBox(height: Dimensions.paddingSizeExtraLarge,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Row(
+                    children: [
+                      Text("تحديد العقار",style: Theme.of(context).textTheme.titleLarge!),
+                    ],
                   ),
-                  shrinkWrap: true,
-                  itemCount: 6,
-                  scrollDirection: Axis.vertical,
-                  physics: ScrollPhysics(),
-                  itemBuilder: (context,index){
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Stack(
-                        children: [
-                          SizedBox(
-                            width: 260,
-                            child: Card(
-                              color: index == 0 ? Theme.of(context).primaryColor:Colors.white,
-                              child: Column(
-                                // mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: (){},
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                                        child: Image.asset(
-                                          searchImage[index],
-                                          height: 169,
-                                          fit: BoxFit.cover ,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 2),
+
+                ),
+                SizedBox(height: Dimensions.paddingSizeDefault,),
+                userProp.handelState<List<RealStateModel>>(
+                    onLoading: (state) => SizedBox(
+                      height: MediaQuery.of(context).size.height*.6,
+                        child: ShimmerList("Grid")),
+                    onSuccess:(state)=> GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2, // number of items in each row
+                            mainAxisSpacing: 2.0, // spacing between rows
+                            crossAxisSpacing: 2.0, // spacing between columns
+                            mainAxisExtent: 250
+                        ),
+                        shrinkWrap: true,
+                        itemCount: userProp.data!.length,
+                        scrollDirection: Axis.vertical,
+                        physics: ScrollPhysics(),
+                        itemBuilder: (context,index){
+                          var item = userProp.data![index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Stack(
+                              children: [
+                                SizedBox(
+                                  width: 260,
+                                  child: Card(
+                                    color: ref.watch(estateSelectionProvider(index)) ? Theme.of(context).primaryColor:Colors.white,
                                     child: Column(
+                                      // mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(" شقه للايجار في الشامخه",
-                                            style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600,fontSize: 12,color: index ==0 ? Colors.white : Colors.black)),
+                                        InkWell(
+                                          onTap: (){
+                                            ref.read(estateSelectionProvider(index).notifier).state =  !ref.read(estateSelectionProvider(index).notifier).state;
+                                            ref.read(EstateManagerProvider.notifier).addEstate(item, ref.watch(estateSelectionProvider(index)));
+                                            print(ref.watch(estateSelectionProvider(index)));
+
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(6.0),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                                              child: item.images.isEmpty?Container( height: 169,color: Colors.grey,)
+                                                  :Image.network(
+                                                item.images.first.path,
+                                                height: 169,
+                                                width: 260,
+                                                fit: BoxFit.cover ,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(item.title,
+                                                  style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600,fontSize: 12,color: ref.watch(estateSelectionProvider(index)) ? Colors.white : Colors.black)),
+                                            ],
+                                          ),
+                                        )
                                       ],
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 18,
-                            right: 18,
-                            child: SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: Stack(
-                                children: [
-                                  Center(child: Container(width: 25,height:25,
-                                    decoration: BoxDecoration(color: index == 0 ? Theme.of(context).primaryColor: Colors.grey,borderRadius: BorderRadius.circular(50)),)),
-                                  Center(child: Text("✓",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white),)),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 18,
+                                  right: 18,
+                                  child: SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: Stack(
+                                      children: [
+                                        Center(child: Container(width: 25,height:25,
+                                          decoration: BoxDecoration(color: ref.watch(estateSelectionProvider(index)) ? Theme.of(context).primaryColor: Colors.grey,borderRadius: BorderRadius.circular(50)),)),
+                                        Center(child: Text("✓",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white),)),
 
-                                ],
-                              ),),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-              SizedBox(height: 60,)
-            ],
+                                      ],
+                                    ),),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                    onFailure: (state) =>Text("SHIT")
+                ),
+                SizedBox(height: 60,)
+              ],
+            ),
           ),
         ),
       ),
@@ -197,9 +233,23 @@ class _AddHousingOfficalState extends State<AddHousingOffical> {
               borderRadius: 12,
               textColor: Colors.white,
               onPressed: (){
-                showAnimatedDialog(
-                    context, dismissible: false, housingOfficalAdded()
-                );
+                if(addEstateToManage.isNotEmpty){
+                  List<String> propsId = [];
+                  addEstateToManage.forEach((element) {propsId.add(element.id!);});
+                  if(_formKey.currentState!.validate()){
+                    ref.read(EstateManagerProvider.notifier).addEstateToManage(
+                        ManagerModel(
+                            phone: phoneEditingController.text,
+                            name: nameEditingController.text,
+                            properties: propsId))
+                    ;                    showAnimatedDialog(
+                        context, dismissible: false, housingOfficalAdded()
+                    );
+                  }
+                }else{
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("قم بتحديد العقار",style: TextStyle(color: Colors.black),)));
+                }
+
               }
           ),
         ),
@@ -207,6 +257,7 @@ class _AddHousingOfficalState extends State<AddHousingOffical> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+
   List<String> searchImage =[
     "assets/images/estate1.png",
     "assets/images/estate2.png",

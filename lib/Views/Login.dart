@@ -1,3 +1,4 @@
+import 'package:aqary/data/services/FiresbaseServices.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,13 +18,14 @@ class Login extends ConsumerStatefulWidget {
 
 class _LoginState extends ConsumerState<Login> {
 
+  FirebaseServices firebaseServices  = FirebaseServices();
   final key = GlobalKey<FormState>();
   FocusNode _focusNode = FocusNode();
   var phone = TextEditingController();
   final pinController = TextEditingController();
   var countryCode = CountryCode(code: '+971',name: 'AE',dialCode: '+971');
   String? verfication;
-  AuthService? auth;
+  AuthService? auth = AuthService();
 
 
   @override
@@ -179,10 +181,12 @@ class _LoginState extends ConsumerState<Login> {
                                                 codeSent: (String verificationID, int? forceResendingToken) {
                                                   Navigator.push(context, MaterialPageRoute(builder: (context) => OtpVerf(verificationID,"$countryCode${phone.text}",pinController)));
                                                   ref.read(loadingState.notifier).state = false;
+
                                                 },
                                                 codeAutoRetrievalTimeout: (String verificationId) {
-                                                   Navigator.push(context, MaterialPageRoute(builder: (context) => OtpVerf(verificationId,"$countryCode${phone.text}",pinController)));
+                                                  // Navigator.push(context, MaterialPageRoute(builder: (context) => OtpVerf(verificationId,"$countryCode${phone.text}",pinController)));
                                                    ref.read(loadingState.notifier).state = false;
+                                                   print("HelloBYNAme");
                                                 },
                                                 timeout: Duration(seconds: 45)
                                               );

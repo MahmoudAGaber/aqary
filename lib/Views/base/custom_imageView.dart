@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomImageView extends StatefulWidget {
-  String imageUrl;
-  CustomImageView({super.key,required this.imageUrl});
+  List<dynamic> imagesUrl;
+  CustomImageView({super.key,required this.imagesUrl});
 
   @override
   State<CustomImageView> createState() => _CustomImageViewState();
@@ -14,15 +14,22 @@ class CustomImageView extends StatefulWidget {
 class _CustomImageViewState extends State<CustomImageView> {
   @override
   Widget build(BuildContext context) {
-    return  PageView(
-        children: [
-          GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-            },
-              child: Image.asset(widget.imageUrl,fit: BoxFit.fitWidth,))
-        ],
+    return  GestureDetector(
+      onTap: (){
+        Navigator.pop(context);
+      },
+      child: PageView.builder(
+        itemCount: widget.imagesUrl.length,
+          itemBuilder: (context, index){
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              Image.network(widget.imagesUrl[index].path,fit: BoxFit.cover,)]);
+          },
 
+
+
+      ),
     );
   }
 }

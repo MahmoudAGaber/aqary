@@ -1,9 +1,14 @@
 
+import 'package:aqary/Models/PromoModel.dart';
+import 'package:aqary/ViewModel/PromoViewModel.dart';
 import 'package:aqary/Views/HomePage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pay/pay.dart';
+import '../../../../Models/RealStateModel.dart';
+import '../../../../ViewModel/RealStateViewModel.dart';
 import '../../../../utill/dimensions.dart';
 import '../../../base/custom_button.dart';
 import '../../../base/custom_dialog.dart';
@@ -13,7 +18,7 @@ import 'package:aqary/payment_configurations.dart' as payment_configurations;
 enum DistinctionEstateEnum { day, week, month }
 
 class Distinction {
-  void distinctionEstate(BuildContext context) {
+  void distinctionEstate(BuildContext context,RealStateModel realStateModel) {
     DistinctionEstateEnum? distinction = DistinctionEstateEnum.day;
     final screenHeight = MediaQuery
         .of(context)
@@ -29,6 +34,8 @@ class Distinction {
       builder: (BuildContext context) {
         return Consumer(
             builder: (context, ref, child) {
+              ref.read(PromoProvider.notifier).getPromo();
+              var promos = ref.watch(PromoProvider);
               return WillPopScope(
                 onWillPop: () async {
                   return true;
@@ -46,12 +53,11 @@ class Distinction {
                             top: Dimensions.paddingSizeDefault,
                             right: Dimensions.paddingSizeDefault,
                             left: Dimensions.paddingSizeDefault),
-                        child: SingleChildScrollView(
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                children: [
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 25),
                                     child: Center(
@@ -90,43 +96,57 @@ class Distinction {
                                   ),
                                   SizedBox(height: Dimensions
                                       .paddingSizeDefault,),
-                                  Column(
-                                    children: List.generate(
-                                        distinctionEstateTxt.length, (index) =>
-                                        distinctionWidget(
-                                            index, context, distinction)),
+                                  SingleChildScrollView(
+                                    child: Column(
+                                      children: List.generate(
+                                          promos.length, (index) =>
+                                          distinctionWidget(
+                                              index, context, distinction,promos)),
+                                    ),
                                   ),
-                                  SizedBox(height: Dimensions
-                                      .paddingSizeDefault,),
-                                  CustomButton(
-                                      buttonText: "متابعه",
-                                      height: 57,
-                                      textColor: Colors.white,
-                                      borderRadius: 12,
-                                      onPressed: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>PaySampleApp()));
-                                      }
-                                  ),
-                                  SizedBox(height: Dimensions
-                                      .paddingSizeDefault,),
-                                  InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        showAnimatedDialog(
-                                            context, dismissible: false,
-                                            estateAdded()
-                                        );
-                                      },
-                                      child: Text("تخطي", style: Theme
-                                          .of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(color: Theme
-                                          .of(context)
-                                          .primaryColor,),))
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 30),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: Dimensions
+                                        .paddingSizeDefault,),
+                                    CustomButton(
+                                        buttonText: "متابعه",
+                                        height: 57,
+                                        textColor: Colors.white,
+                                        borderRadius: 12,
+                                        onPressed: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>PaySampleApp()));
+                                        }
+                                    ),
+                                    SizedBox(height: Dimensions
+                                        .paddingSizeDefault,),
+                                    InkWell(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          realStateModel = realStateModel.copyWith(
+                                              promotion: "65f1165baaf8d1c330a14f2e",
+                                          );
+                                          ref.read(RealStateProvider.notifier).addRealState(realStateModel);
+                                          showAnimatedDialog(
+                                              context, dismissible: false,
+                                              estateAdded()
+                                          );
+                                        },
+                                        child: Text("تخطي", style: Theme
+                                            .of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(color: Theme
+                                            .of(context)
+                                            .primaryColor,),))
+                                  ],
+                                ),
+                              )
 
-                                ])
-                        )
+                            ])
                     )
                 ),
               );
@@ -136,13 +156,13 @@ class Distinction {
     );
 
   }
-  List<String> distinctionEstateTxt = [
-    "يوم واحد ( 10 \$ )",
-    "أسبوع ( 10 \$ )",
-    "شهر ( 10 \$ )"
-  ];
+  // List<String> distinctionEstateTxt = [
+  //   "يوم واحد ( 10 \$ )",
+  //   "أسبوع ( 10 \$ )",
+  //   "شهر ( 10 \$ )"
+  // ];
 
-  Widget distinctionWidget(index,context,distinction){
+  Widget distinctionWidget(index,context,distinction,List<PromoModel> promo){
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Container(
@@ -152,7 +172,7 @@ class Distinction {
           ),
           width: MediaQuery.of(context).size.width,
           child: ListTile(
-            title:  Text(distinctionEstateTxt[index],style: Theme.of(context).textTheme.bodyMedium),
+            title:  Text("${promo[index].description} / ${promo[index].price}",style: Theme.of(context).textTheme.bodyMedium),
             trailing: Radio<DistinctionEstateEnum>(
               activeColor: Theme.of(context).primaryColor,
               fillColor: MaterialStateColor.resolveWith((states){
@@ -210,7 +230,7 @@ class Distinction {
                     onPressed: (){
                       Navigator.push(dialogContext, MaterialPageRoute(builder: (BuildContext? context) {
                         if (context != null) {
-                          return Homepage();
+                          return Homepage(page: 0,);
                         } else {
                           // Handle the case where context is null
                           return Container(); // or any other fallback UI

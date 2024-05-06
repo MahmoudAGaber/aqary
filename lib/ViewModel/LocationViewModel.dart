@@ -1,3 +1,4 @@
+import 'package:aqary/data/RequestHandler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -5,20 +6,36 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../Models/LocationDataModel.dart';
 
-final locationProvider = StateNotifierProvider<LocationNotifier, LocationData?>((ref) {
-  return LocationNotifier(ref);
+final estatelocationProvider = StateNotifierProvider<EstateLocationNotifier, LocationData?>((ref) {
+  return EstateLocationNotifier(ref);
 });
 
+final userLocationProvider = StateNotifierProvider<UserLocationNotifier, LocationData?>((ref) {
+  return UserLocationNotifier(ref);
+});
 
-class LocationNotifier extends StateNotifier<LocationData?> {
+final usreChangeLocationProvider = StateProvider<String>((ref) => "");
+
+//final estateAddressProvider = StateNotifierProvider<EstateLocationNotifier,LocationData>((ref) => EstateLocationNotifier(ref));
+
+// class EstateAddressNotifier extends StateNotifier<LocationData> {
+//   Ref ref;
+//   EstateAddressNotifier(this.ref):super(LocationData());
+//
+//   void setEstateAddress(address){
+//     state = address;
+//   }
+// }
+
+class EstateLocationNotifier extends StateNotifier<LocationData?> {
   Ref ref;
-  LocationNotifier(this.ref) : super(LocationData(longtude: 5.0, latitude: 0.0));
+  EstateLocationNotifier(this.ref) : super(LocationData(longtude: 5.0, latitude: 0.0));
 
   GoogleMapController? _mapController;
 
   GoogleMapController? get mapController => _mapController;
 
-  Future<void> getCurrentLocation() async {
+  Future<LocationData> getCurrentEstateLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
@@ -27,25 +44,27 @@ class LocationNotifier extends StateNotifier<LocationData?> {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
-        localeIdentifier: 'ar'
+        localeIdentifier: 'ar-SA'
       );
+     placemarks.forEach((element) {print(element.subAdministrativeArea);});
 
       LocationData locationData = LocationData(
         longtude: position.longitude,
         latitude:  position.latitude,
-        placemark: placemarks.isNotEmpty ? placemarks.first : null,
+        placemark: placemarks.isNotEmpty ? placemarks[3] : null,
       );
 
       state = locationData;
 
-
+      return state!;
     } catch (e) {
       print(e);
       state = null;
     }
+    return state!;
   }
 
-  Future<void> changeCurrentLocation(LatLng point) async {
+  Future<void> changeCurrentEstateLocation(LatLng point) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         point.latitude,
@@ -57,7 +76,7 @@ class LocationNotifier extends StateNotifier<LocationData?> {
         state = LocationData(
           latitude: point.latitude,
           longtude: point.longitude,
-          placemark: placemarks.first,
+          placemark: placemarks[3],
 
         );
       }
@@ -71,7 +90,7 @@ class LocationNotifier extends StateNotifier<LocationData?> {
   }
 
   void onTap(LatLng point) async {
-    await changeCurrentLocation(point);
+    await changeCurrentEstateLocation(point);
   }
 
   void onDonePressed() {
@@ -80,6 +99,79 @@ class LocationNotifier extends StateNotifier<LocationData?> {
     print("Selected Address: ${state?.placemark!.name}");
   }
 }
+
+class UserLocationNotifier extends StateNotifier<LocationData?> {
+  Ref ref;
+  UserLocationNotifier(this.ref) : super(LocationData(longtude: 5.0, latitude: 0.0));
+
+  RequestHandler requestHandler = RequestHandler();
+  GoogleMapController? _mapController;
+
+  GoogleMapController? get mapController => _mapController;
+
+  Future<LocationData> getCurrentUserLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+          localeIdentifier: 'ar-SA'
+      );
+      placemarks.forEach((element) {print(element.subAdministrativeArea);});
+
+      LocationData locationData = LocationData(
+        longtude: position.longitude,
+        latitude:  position.latitude,
+        placemark: placemarks.isNotEmpty ? placemarks[3] : null,
+      );
+
+      state = locationData;
+
+      return state!;
+    } catch (e) {
+      print(e);
+      state = null;
+    }
+    return state!;
+  }
+
+  Future<void> changeCurrentUserLocation(LatLng point) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          point.latitude,
+          point.longitude,
+          localeIdentifier: 'ar'
+      );
+
+      if (placemarks.isNotEmpty) {
+        state = LocationData(
+          latitude: point.latitude,
+          longtude: point.longitude,
+          placemark: placemarks[3],
+
+        );
+        var city = "${state!.placemark!.country}, ${state!.placemark!.locality}, ${state!.placemark!.administrativeArea}";
+        ref.read(usreChangeLocationProvider.notifier).state = city;
+        await requestHandler.getData(
+          endPoint: "/countries/change/$city",
+          auth: true, fromJson: (json) {  },
+        );
+      }
+    } catch (e) {
+      print("Error getting address: $e");
+    }
+  }
+}
+
+
+
+
+
+
+
 
 
 

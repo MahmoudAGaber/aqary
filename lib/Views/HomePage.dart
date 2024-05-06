@@ -10,15 +10,26 @@ import 'Home/Home.dart';
 import 'Profile/Profile.dart';
 
 class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+  int page;
+   Homepage({super.key,required this.page});
 
   @override
   State<Homepage> createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
-  int _currentIndex = 0;
+  int? _currentIndex;
 
+  @override
+  void initState() {
+    _currentIndex = widget.page;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+
+
+    });
+    super.initState();
+  }
   final List<Widget> _tabs = [
     Home(),
     Favourites(),
@@ -55,7 +66,7 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: _tabs[_currentIndex],
+      body: _tabs[_currentIndex!],
       bottomNavigationBar: BottomAppBar(
         padding: EdgeInsets.only(top: 3),
         shape: CircularNotchedRectangle(),
@@ -64,7 +75,7 @@ class _HomepageState extends State<Homepage> {
         color: Theme.of(context).primaryColor.withOpacity(0.4),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          currentIndex: _currentIndex,
+          currentIndex: _currentIndex!,
           onTap: (index) {
             setState(() {
               _currentIndex = index;

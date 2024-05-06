@@ -1,204 +1,179 @@
 
 
+import 'dart:io';
+
+import 'package:aqary/Models/CategoryModel.dart';
+import 'package:aqary/Models/RealStateModel.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
 import 'package:aqary/Views/base/custom_shadow_view.dart';
+import 'package:aqary/data/StateModel.dart';
+import 'package:aqary/payment_configurations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../ViewModel/RealStateViewModel.dart';
 import '../../../utill/dimensions.dart';
 import '../../base/custom_button.dart';
 import '../../base/custom_imageView.dart';
 import '../MapView.dart';
 import 'Rent.dart';
 
-class EstateDetails extends StatefulWidget {
-  const EstateDetails({super.key});
+class EstateDetails extends ConsumerStatefulWidget {
+  String propertyId;
+
+  EstateDetails({super.key, required this.propertyId});
 
   @override
-  State<EstateDetails> createState() => _EstateDetailsState();
+  ConsumerState<EstateDetails> createState() => _EstateDetailsState();
 }
 
-class _EstateDetailsState extends State<EstateDetails> {
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(25.1937, 55.2666),
-    zoom: 14.3,
-  );
+class _EstateDetailsState extends ConsumerState<EstateDetails> {
+
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp)async {
+     await ref.read(RealStateGetOneProvider.notifier).getOneEstate(widget.propertyId);
+
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+   var stateDetails =  ref.watch(RealStateGetOneProvider);
     return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height*.62, // Set the height of the header when expanded
-            floating: true,
-            leading: InkWell(
-              onTap: (){
-                Navigator.pop(context);
-              },
-                child: Icon(Icons.arrow_back_ios)),
-            actions:[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: CustomShadowView(
-                  borderRadius: 50,
-                    padding: EdgeInsets.all(8),
-                    color: Theme.of(context).primaryColor,
-                    isActive: true,
-                    child: Icon(CupertinoIcons.heart_solid,size: 18,)),
-              )
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
-                children: <Widget>[
-                  // Add the background image
-                  InkWell(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> CustomChatImageView(imageUrl: "assets/images/Shape.png",)));
+      body: stateDetails.handelState<RealStateModel>(
+          onLoading: (state) => Center(child: SizedBox(height:30,width:30,child: CircularProgressIndicator(color: Colors.grey,))),
+        onSuccess: (state) {
+          var item = stateDetails.data!.data;
+          var images = item.images.cast<dynamic>();
 
-                    },
-                    child: Image.asset(
-                      'assets/images/Shape.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 16, bottom: 16),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 1.0, end: 0.0),
-                        duration: Duration(milliseconds: 500),
-                        builder: (BuildContext context, double value,
-                            Widget? child) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: List.generate(searchImage.length < 3 ? searchImage.length : 3, (index) => estateViews(index))
-                          );
-                        },
-                      ),
-                    ),
+          return CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
+                  expandedHeight: MediaQuery.of(context).size.height*.62, // Set the height of the header when expanded
+                  floating: true,
+                  leading: InkWell(
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.arrow_back_ios)),
+                  actions:[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: CustomShadowView(
+                          borderRadius: 50,
+                          padding: EdgeInsets.all(8),
+                          color: Theme.of(context).primaryColor,
+                          isActive: true,
+                          child: Icon(CupertinoIcons.heart_solid,size: 18,)),
+                    )
+                  ],
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        // Add the background image
+                        InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> CustomImageView(imagesUrl: images,)));
 
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 16, bottom: 16),
-                      child: Container(
-                        height: 40,
-                        width: 70,
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(8)
+                          },
+                          child:item.images.isEmpty ? SizedBox() :Image.network(
+                            item.images.first.path,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        child: Center(child: Text("شقه",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),)),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            // Other properties like pinned, floating, elevation, etc.
-            // can be customized as needed
-          ),
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 16, bottom: 16),
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween<double>(begin: 1.0, end: 0.0),
+                              duration: Duration(milliseconds: 500),
+                              builder: (BuildContext context, double value,
+                                  Widget? child) {
+                                return Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: List.generate(item.images.length < 3 ? item.images.length : 3, (index) => estateViews(index, item))
+                                );
+                              },
+                            ),
+                          ),
 
-          SliverFillRemaining(
-              hasScrollBody: false,
-              child: SizedBox(
-                height: 1050,
-                child: Padding(
-                  padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 8,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 16, bottom: 16),
+                            child: Container(
+                              height: 40,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(8)
+                              ),
+                              child: Center(child: Text("شقه",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),)),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  // Other properties like pinned, floating, elevation, etc.
+                  // can be customized as needed
+                ),
+
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: SizedBox(
+                    height: 1050,
+                    child: Padding(
+                      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("شقه للايجار في الشامخه", style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w600)),
-                          SizedBox(width: 4,),
-                          Text("30,000 درهم / سنويا", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor),),
-                        ],
-                      ),
-                      SizedBox(height: 8,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                          SizedBox(height: 8,),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.grey,
-                                size: 16,
-                              ),
-                              SizedBox(
-                                width: Dimensions.paddingSizeExtraSmall,
-                              ),
-                              Text(
-                                "الشامخه, أبوظبي",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(color: Colors.grey),
-                              ),
+                              Text(item.title, style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w600)),
+                              SizedBox(width: 4,),
+                              Text("${item.yearPrice} درهم / سنويا", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor),),
                             ],
                           ),
-                          Icon(Icons.share,size: 20,)
-                        ],
-                      ),
-                      SizedBox(height: Dimensions.paddingSizeExtraLarge,),
-                      Container(
-                        height: 85,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(0xFFF5F4F7)
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-                          child: Row(
+                          SizedBox(height: 8,),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  CircleAvatar(
-                                    radius: 16,
+                                  Icon(
+                                    Icons.location_on,
+                                    color: Colors.grey,
+                                    size: 16,
                                   ),
-                                  SizedBox(width: Dimensions.paddingSizeDefault,),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "احمد محمد",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(fontSize: 15),
-                                      ),
-                                      Text(
-                                        "وكيل عقارات",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(color: Colors.grey),
-                                      ),
-                                    ],
-                                  )
+                                  SizedBox(
+                                    width: Dimensions.paddingSizeExtraSmall,
+                                  ),
+                                  Text(
+                                    "${item.country}, ${item.city}",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(color: Colors.grey),
+                                  ),
                                 ],
                               ),
-                              SvgPicture.asset('assets/images/messageminus.svg')
+                              Icon(Icons.share,size: 20,)
                             ],
                           ),
-                        ),
-                      ),
-                      SizedBox(height: Dimensions.paddingSizeExtraLarge,),
-                      Row(
-                        children: [
+                          SizedBox(height: Dimensions.paddingSizeExtraLarge,),
                           Container(
-                            height: 50,
+                            height: 85,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 color: Color(0xFFF5F4F7)
@@ -206,149 +181,207 @@ class _EstateDetailsState extends State<EstateDetails> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset("assets/images/bed.svg"),
-                                  SizedBox(width: Dimensions.paddingSizeSmall,),
-                                  Text("2 غرفه نوم",style: Theme.of(context).textTheme.bodyMedium,)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 16,
+                                      ),
+                                      SizedBox(width: Dimensions.paddingSizeDefault,),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                             item.createdBy['name'] == null || item.createdBy['name'].isEmpty
+                                                ?item.createdBy['phone']
+                                                :item.createdBy['name'],
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium!
+                                                .copyWith(fontSize: 15),
+                                          ),
+                                          Text(
+                                            "وكيل عقارات",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(color: Colors.grey),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  SvgPicture.asset('assets/images/messageminus.svg')
                                 ],
                               ),
                             ),
                           ),
-                          SizedBox(width: Dimensions.paddingSizeDefault,),
-                          Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Color(0xFFF5F4F7)
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset("assets/images/bathroom.svg"),
-                                  SizedBox(width: Dimensions.paddingSizeSmall,),
-                                  Text("2 حمام",style: Theme.of(context).textTheme.bodyMedium,)
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: Dimensions.paddingSizeExtraLarge,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: Text("المواصفات",style: Theme.of(context).textTheme.titleLarge!),
-                          ),
-                          SizedBox(height: Dimensions.paddingSizeSmall,),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Color(0xFFF5F4F7)
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault,vertical:Dimensions.paddingSizeDefault ),
-                              child: Text("هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النصهذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.black45),),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: Dimensions.paddingSizeExtraLarge,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: Text("الموقع",style: Theme.of(context).textTheme.titleLarge!),
-                          ),
-                          SizedBox(height: Dimensions.paddingSizeSmall,),
+                          SizedBox(height: Dimensions.paddingSizeExtraLarge,),
                           Row(
                             children: [
                               Container(
-                                width: 44,
-                                height: 44,
+                                height: 50,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
+                                    borderRadius: BorderRadius.circular(8),
                                     color: Color(0xFFF5F4F7)
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall,vertical:Dimensions.paddingSizeSmall ),
-                                  child: Icon(Icons.location_on_outlined,size: 18,),
+                                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset("assets/images/bed.svg"),
+                                      SizedBox(width: Dimensions.paddingSizeSmall,),
+                                      Text("${item.bedroomsCount} غرفه نوم",style: Theme.of(context).textTheme.bodyMedium,)
+                                    ],
+                                  ),
                                 ),
                               ),
-                              SizedBox(width: Dimensions.paddingSizeSmall,),
-                              Text(
-                                "شقه 12675, الشامخه, أبوظبي",
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey),
+                              SizedBox(width: Dimensions.paddingSizeDefault,),
+                              Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Color(0xFFF5F4F7)
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset("assets/images/bathroom.svg"),
+                                      SizedBox(width: Dimensions.paddingSizeSmall,),
+                                      Text("${item.bathroomsCount} حمام",style: Theme.of(context).textTheme.bodyMedium,)
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                          SizedBox(height: Dimensions.paddingSizeDefault,),
-                          Container(
-                            height: 52,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color:Color(0xFFECEDF3))
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.location_on,size: 20,color: Colors.grey,),
-                                  SizedBox(width: Dimensions.paddingSizeSmall,),
-                                  Text("2.5 كم",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor)),
-                                  SizedBox(width: 4,),
-                                  Text("من موقعك",style: Theme.of(context).textTheme.bodyMedium!),
-                                ],
+                          SizedBox(height: Dimensions.paddingSizeExtraLarge,),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                child: Text("المواصفات",style: Theme.of(context).textTheme.titleLarge!),
                               ),
-                            ),
+                              SizedBox(height: Dimensions.paddingSizeSmall,),
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Color(0xFFF5F4F7)
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault,vertical:Dimensions.paddingSizeDefault ),
+                                  child: Text(item.description,style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.black45),),
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: Dimensions.paddingSizeDefault,),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 200,
-                              child: Stack(
+                          SizedBox(height: Dimensions.paddingSizeExtraLarge,),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                child: Text("الموقع",style: Theme.of(context).textTheme.titleLarge!),
+                              ),
+                              SizedBox(height: Dimensions.paddingSizeSmall,),
+                              Row(
                                 children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: GoogleMap(
-                                      onTap: (v){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=> MapView()));
-                                      },
-                                      initialCameraPosition: _kGooglePlex ,
-                                      liteModeEnabled: true,
-                                      mapType: MapType.terrain,
-                                      indoorViewEnabled: false,
-                                      mapToolbarEnabled: false,
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: Color(0xFFF5F4F7)
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall,vertical:Dimensions.paddingSizeSmall ),
+                                      child: Icon(Icons.location_on_outlined,size: 18,),
                                     ),
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    child: Container(
-                                      height: 35,
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: BoxDecoration(
-                                          color: Color(0xffF9FAFA)
-                                        //borderRadius: BorderRadius.circular(12)
-                                      ),
-                                      child: Center(child: Text("عرض الموقع علي الخريطه",style: Theme.of(context).textTheme.bodySmall!.copyWith(color:  Color(0xff677294)))),
+                                  SizedBox(width: Dimensions.paddingSizeSmall,),
+                                  Flexible(
+                                    child: Text(
+                                      item.location,
+                                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey),
                                     ),
-                                  )
+                                  ),
                                 ],
-                              )),
+                              ),
+                              SizedBox(height: Dimensions.paddingSizeDefault,),
+                              Container(
+                                height: 52,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color:Color(0xFFECEDF3))
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.location_on,size: 20,color: Colors.grey,),
+                                      SizedBox(width: Dimensions.paddingSizeSmall,),
+                                      Text("${item.distance!.toStringAsFixed(1)} كم",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor)),
+                                      SizedBox(width: 4,),
+                                      Text("من موقعك",style: Theme.of(context).textTheme.bodyMedium!),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: Dimensions.paddingSizeDefault,),
+                              Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 260,
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: GoogleMap(
+                                          onTap: (v){
+                                            Navigator.push(context, MaterialPageRoute(builder: (context)=> MapView(lat: LatLng(item.lat, item.long),title: 'موقع العقار',isSelected: false,isUserLocation: false,)));
+                                          },
+                                          initialCameraPosition: CameraPosition(
+                                            target: LatLng(item.lat,item.long),
+                                            zoom: 14.3,
+                                          ),
+                                          liteModeEnabled: true,
+                                          mapType: MapType.terrain,
+                                          indoorViewEnabled: false,
+                                          mapToolbarEnabled: false,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        child: Container(
+                                          height: 35,
+                                          width: MediaQuery.of(context).size.width,
+                                          decoration: BoxDecoration(
+                                              color: Color(0xffF9FAFA)
+                                            //borderRadius: BorderRadius.circular(12)
+                                          ),
+                                          child: Center(child: Text("عرض الموقع علي الخريطه",style: Theme.of(context).textTheme.bodySmall!.copyWith(color:  Color(0xff677294)))),
+                                        ),
+                                      )
+                                    ],
+                                  )),
+                            ],
+                          ),
+
+
                         ],
                       ),
-
-
-                    ],
+                    ),
                   ),
                 ),
-              ),
-          ),
-        ],
+              ],
+            );
+        },
+        onFailure: (state)=> Text("SHIT")
       ),
       floatingActionButton:Container(
         color: Colors.white,
@@ -375,7 +408,7 @@ class _EstateDetailsState extends State<EstateDetails> {
                     textColor: Theme.of(context).primaryColor,
                     borderRadius: 8,
                     onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (contex)=>Rent()));
+                      Navigator.push(context, MaterialPageRoute(builder: (contex)=>Rent(property: stateDetails.data!.data,)));
                     }
                 ),
               ),
@@ -388,16 +421,16 @@ class _EstateDetailsState extends State<EstateDetails> {
     );
 
   }
-  List<String> searchImage =[
-    "assets/images/estate1.png",
-    "assets/images/estate1.png",
-    "assets/images/estate1.png",
-    "assets/images/estate1.png",
-    "assets/images/estate1.png",
-    "assets/images/estate1.png",
-  ];
+  // List<String> searchImage =[
+  //   "assets/images/estate1.png",
+  //   "assets/images/estate1.png",
+  //   "assets/images/estate1.png",
+  //   "assets/images/estate1.png",
+  //   "assets/images/estate1.png",
+  //   "assets/images/estate1.png",
+  // ];
 
-  Widget estateViews(index){
+  Widget estateViews(index,item){
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
@@ -410,11 +443,11 @@ class _EstateDetailsState extends State<EstateDetails> {
             color: Colors.white,
           ),
           image: DecorationImage(
-            image: AssetImage(searchImage[index]),
+            image: NetworkImage(item.images[index].path),
             fit: BoxFit.fill,
           ),
         ),
-        child: index >= 2 ? Center(child: Text(searchImage.length == 3 ? "": "${searchImage.length - 3}+",
+        child: index >= 2 ? Center(child: Text(item.images.length == 3 ? "": "${item.images.length - 3}+",
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Colors.white,fontWeight: FontWeight.bold),),
         ): SizedBox()
       ),

@@ -3,25 +3,28 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../../ViewModel/RealStateViewModel.dart';
 import '../../../../utill/dimensions.dart';
 import '../../../base/custom_app_bar.dart';
 import '../../../base/custom_button.dart';
 import '../AddEstate/AddEstate.dart';
 
-class ContractDetails extends StatefulWidget {
+class ContractDetails extends ConsumerStatefulWidget {
   const ContractDetails({super.key});
 
   @override
-  State<ContractDetails> createState() => _ContractDetailsState();
+  ConsumerState<ContractDetails> createState() => _ContractDetailsState();
 }
 
-class _ContractDetailsState extends State<ContractDetails> {
-  SingingCharacter? _character = SingingCharacter.lafayette;
-  PaymentsSystem? _payments = PaymentsSystem.annually;
+class _ContractDetailsState extends ConsumerState<ContractDetails> {
+
   @override
   Widget build(BuildContext context) {
+    var paymentSystem = ref.watch(paymentsSystemProvider);
+
     return  Scaffold(
       appBar: CustomAppBar(
         title: "تفاصيل العقد",
@@ -214,7 +217,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                         Wrap(
                             crossAxisAlignment: WrapCrossAlignment.end,
                             alignment: WrapAlignment.center,
-                            children: List.generate(paymentsSystemTxt.length, (index) => paymentWidget(index))
+                            children: List.generate(paymentsSystemTxt.length, (index) => paymentWidget(ref,index,paymentSystem))
                         ),
                       ],
                     ),
@@ -301,6 +304,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                     SizedBox(height: Dimensions.paddingSizeLarge,),
                     CustomButton(
                         buttonText: "إنشاء",
+                        textColor: Colors.white,
                         height: 50,
                         borderRadius: 12,
                         onPressed: (){
@@ -320,7 +324,7 @@ class _ContractDetailsState extends State<ContractDetails> {
     "ربع سنوي",
   ];
 
-  Widget paymentWidget(index){
+  Widget paymentWidget(ref,index,paymentSystem){
     return  SizedBox(
       width: MediaQuery.of(context).size.width*.45,
       child: ListTile(
@@ -335,11 +339,11 @@ class _ContractDetailsState extends State<ContractDetails> {
             // inactive
             return Colors.grey;
           }),
-          groupValue: _payments,
+          groupValue: paymentSystem,
           onChanged: (PaymentsSystem? value) {
-            setState(() {
-              _payments = value;
-            });
+            if(value != null){
+              ref.read(paymentsSystemProvider.notifier).state = value;
+            }
           },
         ),
       ),

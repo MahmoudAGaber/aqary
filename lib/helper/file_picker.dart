@@ -6,41 +6,44 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../data/services/FiresbaseServices.dart';
 
-final localImage = StateProvider<String>((ref) => "");
+final localImageProvider = StateProvider<File>((ref) => File(""));
 
 
 class FilePickerHelper {
 
   static Uint8List? localImgUrl;
 
-  static void pickFiles() async {
+   Future<List<File>> pickFiles(bool isOne) async {
+    List<File> files = [];
     final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: ['jpeg', 'jpg', 'png', 'flv', 'mkv', 'mov', 'mp4', 'mpeg', 'webm', 'wmv'],
+        allowMultiple: isOne? false : true,
+        type: FileType.custom,
+        allowedExtensions: ['jpeg', 'jpg', 'png', 'flv', 'mkv', 'mov', 'mp4', 'mpeg', 'webm', 'wmv'],
+        withData: true
     );
     if (result != null) {
-      List<MultipartFile> files = result.files.map((file) =>
-          MultipartFile.fromBytes(
-            file.bytes as List<int>,
-            filename: file.name,
-          ))
-          .toList();
+      for (var file in result.files) {
+        if (file.bytes != null) {
+          Directory tempDir = await getTemporaryDirectory();
+          String tempPath = tempDir.path;
 
-      var formData = FormData.fromMap({
-        'id': '',
-        'type': '',
-        'docType': '',
-        'files': files,
-      });
-      for (var element in formData.files) {
-        print("OKKK${element.value.filename}");
+          File tempFile = File('$tempPath/${file.name}');
+          await tempFile.writeAsBytes(file.bytes!);
+
+          files.add(tempFile);
+        } else {
+          throw Exception('File bytes are null for file: ${file.name}');
+        }
       }
     }
+
+    return files;
   }
+
 
    Future<String> pickFile(chatRoomId,messageType) async {
     FirebaseServices firebaseServices = FirebaseServices();

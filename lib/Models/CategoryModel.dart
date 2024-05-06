@@ -1,8 +1,10 @@
 
+import 'package:aqary/Models/RealStateModel.dart';
+
 class CategoryModel {
   final String id;
   final String title;
-  final List<Property> properties;
+  final List<RealStateModel> properties;
   final String createdAt;
   final String updatedAt;
   final int v;
@@ -20,10 +22,7 @@ class CategoryModel {
     return CategoryModel(
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
-      properties: (json['properties'] as List<dynamic>?)
-          ?.map((propertyJson) => Property.fromJson(propertyJson))
-          .toList() ??
-          [],
+      properties: RealStateModel.listFromJson(json['properties'] ?? []),
       createdAt: json['createdAt'] ?? '',
       updatedAt: json['updatedAt'] ?? '',
       v: json['__v'] ?? 0,
@@ -35,52 +34,56 @@ class CategoryModel {
   }
 }
 
-class Property {
-  final String id;
-  final List<String> images;
-  final String title;
-  final Country country;
-  final City city;
-  final int bathroomsCount;
-  final int bedroomsCount;
-  final int yearPrice;
-  final String createdAt;
-  final String updatedAt;
-  final int v;
-  final bool isFavorite;
-
-  Property({
-    required this.id,
-    required this.images,
-    required this.title,
-    required this.country,
-    required this.city,
-    required this.bathroomsCount,
-    required this.bedroomsCount,
-    required this.yearPrice,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
-    required this.isFavorite,
-  });
-
-  factory Property.fromJson(Map<String, dynamic> json) {
-    return Property(
-      id: json['_id'] ?? '',
-      images: (json['images'] as List<dynamic>?)?.cast<String>() ?? [],
-      title: json['title'] ?? '',
-      country: Country.fromJson(json['country'] ?? {}),
-      city: City.fromJson(json['city'] ?? {}),
-      bathroomsCount: json['bathrooms_count'] ?? 0,
-      bedroomsCount: json['bedrooms_count'] ?? 0,
-      yearPrice: json['year_price'] ?? 0,
-      createdAt: json['createdAt'] ?? '',
-      updatedAt: json['updatedAt'] ?? '',
-      v: json['__v'] ?? 0,
-      isFavorite: json['isFavorite'] ?? false,
-    );
-  }
-}
+// class Property {
+//   final String id;
+//   final List<String> images;
+//   final String title;
+//   final Country country;
+//   final City city;
+//   final int bathroomsCount;
+//   final int bedroomsCount;
+//   final int yearPrice;
+//   final String createdAt;
+//   final String updatedAt;
+//   final int v;
+//   final bool isFavorite;
+//
+//   Property({
+//     required this.id,
+//     required this.images,
+//     required this.title,
+//     required this.country,
+//     required this.city,
+//     required this.bathroomsCount,
+//     required this.bedroomsCount,
+//     required this.yearPrice,
+//     required this.createdAt,
+//     required this.updatedAt,
+//     required this.v,
+//     required this.isFavorite,
+//   });
+//
+//   factory Property.fromJson(Map<String, dynamic> json) {
+//     return Property(
+//       id: json['_id'] ?? '',
+//       images: (json['images'] as List<dynamic>?)?.cast<String>() ?? [],
+//       title: json['title'] ?? '',
+//       country: Country.fromJson(json['country'] ?? {}),
+//       city: City.fromJson(json['city'] ?? {}),
+//       bathroomsCount: json['bathrooms_count'] ?? 0,
+//       bedroomsCount: json['bedrooms_count'] ?? 0,
+//       yearPrice: json['year_price'] ?? 0,
+//       createdAt: json['createdAt'] ?? '',
+//       updatedAt: json['updatedAt'] ?? '',
+//       v: json['__v'] ?? 0,
+//       isFavorite: json['isFavorite'] ?? false,
+//     );
+//   }
+//
+//   static List<Property> listFromJson(List jsonData){
+//     return jsonData.map((e) => Property.fromJson(e)).toList();
+//   }
+// }
 
 class Country {
   final String id;

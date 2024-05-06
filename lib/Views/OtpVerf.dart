@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:aqary/Views/Home/Home.dart';
 import 'package:aqary/Views/HomePage.dart';
+import 'package:aqary/data/services/FiresbaseServices.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinput/pinput.dart';
 import '../ViewModel/AuthViewModel.dart';
+import '../ViewModel/UserViewModel.dart';
 import '../helper/Authentication.dart';
 
 class OtpVerf extends ConsumerStatefulWidget {
@@ -22,6 +24,7 @@ class OtpVerf extends ConsumerStatefulWidget {
 
 class _OtpVerfState extends ConsumerState<OtpVerf> {
 
+  FirebaseServices firebaseServices = FirebaseServices();
   AuthViewModel authViewModel = AuthViewModel();
   Timer? _timer;
   int _seconds = 45;
@@ -92,6 +95,7 @@ class _OtpVerfState extends ConsumerState<OtpVerf> {
   }
   @override
   Widget build(BuildContext context) {
+    var user = ref.watch(UserProvider);
     final defaultPinTheme = PinTheme(
       width: 60,
       height: 65,
@@ -253,10 +257,21 @@ class _OtpVerfState extends ConsumerState<OtpVerf> {
                                           setState(() {
                                             optSuccess = true;
                                           });
+                                          // String userName;
+                                          // if(user.data!.name.isNotEmpty || user.data!.name != null){
+                                          //    userName = user.data!.name;
+                                          // }
+                                          // else{
+                                          //   userName = "userName";
+                                          // }
+
                                           authViewModel.login(widget.phone, AuthService.shared.auth.currentUser!.uid);
+
+                                          firebaseServices.addUser(AuthService.shared.auth.currentUser!.uid, "${widget.phone}");
+
                                           Timer.periodic(Duration(seconds: 2), (timer) {
                                             try {
-                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (contex) => Homepage()));
+                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (contex) => Homepage(page: 0,)));
                                               ref.read(loadingState.notifier).state = false;
                                               optSuccess = false;
                                             }catch(e){
