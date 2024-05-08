@@ -126,10 +126,23 @@ class Distinction {
                                     InkWell(
                                         onTap: () {
                                           Navigator.pop(context);
-                                          realStateModel = realStateModel.copyWith(
-                                              promotion: "65f1165baaf8d1c330a14f2e",
-                                          );
-                                          ref.read(RealStateProvider.notifier).addRealState(realStateModel);
+                                          Map<String, String> dataToJSon= {
+                                            'title':realStateModel.title,
+                                            'bedrooms_count': realStateModel.bedroomsCount.toString(),
+                                            'bathrooms_count':realStateModel.bathroomsCount.toString(),
+                                            'price': realStateModel.yearPrice,
+                                            'country':realStateModel.country,
+                                            'city': realStateModel.city,
+                                            'type':realStateModel.type,
+                                            'location': realStateModel.location,
+                                            'long':realStateModel.long.toString(),
+                                            'lat': realStateModel.lat.toString(),
+                                            'description':realStateModel.description,
+                                            'payment_duration': realStateModel.paymentDuration.toString(),
+                                            'is_available': realStateModel.isAvailable.toString(),
+
+                                          };
+                                          ref.read(RealStateProvider.notifier).addRealState(realStateModel,dataToJSon);
                                           showAnimatedDialog(
                                               context, dismissible: false,
                                               estateAdded()

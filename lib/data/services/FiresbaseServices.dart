@@ -157,7 +157,7 @@ class FirebaseServices {
 
     void addToUserChats(String uid, chatRoomRef) {
       userCollection.doc(uid).update({
-        'chats': FieldValue.arrayUnion([chatRoomRef]),
+        'chats': FieldValue.arrayUnion([chatRoomRef,]),
       }).then((_) {
         print('Chat room added to user: $uid');
       }).catchError((error) {
@@ -182,7 +182,6 @@ class FirebaseServices {
             chatRooms.doc(roomId).collection('messages').orderBy("messageDate",descending: true).get()).toList();
 
         List<QuerySnapshot<Map<String, dynamic>>> messageSnapshots = await Future.wait(futures);
-        print(messageSnapshots[0].docs[0].get("seen"));
         return messageSnapshots;
       } else {
         print('No chatrooms found for user: $userId');
@@ -209,8 +208,67 @@ class FirebaseServices {
       }
     }
 
+  Future<void> markMessagesAsSeen(String chatRoomId, String currentUserId) async {
+    final collection = FirebaseFirestore.instance
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages');
 
-    Future<void> sendMessage(chatRoomId, dynamic message, String messageType) async {
+    try {
+      final querySnapshot = await collection
+          .where('senderID', isNotEqualTo: currentUserId)
+          .where('seen', isEqualTo: false)
+          .get();
+
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      for (var doc in querySnapshot.docs) {
+        batch.update(doc.reference, {'seen': true});
+      }
+
+
+      await batch.commit();
+      print("All messages marked as seen");
+    } catch (e) {
+      print("Error updating messages: $e");
+      throw e;
+    }
+  }
+
+  Future<int> getUnseenMessageCount(String chatRoomId, String currentUserId) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
+          .collection('chatRooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .where('senderID', isNotEqualTo: currentUserId)
+          .where('seen', isEqualTo: false)
+          .get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error fetching unseen messages: $e');
+      return 0;
+    }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> messagesNotSeen(String chatRoomId) {
+    try {
+      return FirebaseFirestore
+          .instance
+          .collection('chatRooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .orderBy("messageDate")
+          .snapshots();
+    } catch (e) {
+      print("Error fetching messages: $e");
+      throw e; // Rethrow the exception to handle it in the calling code if needed
+    }
+  }
+
+
+    Future<void> sendMessage(chatRoomId, dynamic message, String messageType,String recipientId,String recipientName,String recipientPhone,) async {
 
       CollectionReference messagesCollection = chatRooms.doc(chatRoomId).collection('messages');
       DateTime dateTime = DateTime.now();
@@ -221,8 +279,12 @@ class FirebaseServices {
               message: message,
               messageType: messageType,
               messageId: messagesCollection.doc().id,
+              chatroomId: chatRoomId,
               messageDate: DateConverter.localDateToIsoString(dateTime),
-              senderID: firebaseAuth.currentUser!.uid
+              senderID: firebaseAuth.currentUser!.uid,
+              recipientId : recipientId,
+              recipientName : recipientName,
+              recipientPhone:recipientPhone
           ).toJson());
 
     }

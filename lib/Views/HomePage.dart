@@ -3,21 +3,24 @@ import 'package:aqary/Views/Aqary.dart';
 import 'package:aqary/Views/Chat/Chat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../ViewModel/ChatViewModel.dart';
 import 'Favourites/Favourites.dart';
 import 'Home/Home.dart';
 import 'Profile/Profile.dart';
 
-class Homepage extends StatefulWidget {
+class Homepage extends ConsumerStatefulWidget {
   int page;
    Homepage({super.key,required this.page});
 
   @override
-  State<Homepage> createState() => _HomepageState();
+  ConsumerState<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends ConsumerState<Homepage> {
   int? _currentIndex;
 
   @override
@@ -99,11 +102,43 @@ class _HomepageState extends State<Homepage> {
             ),
             BottomNavigationBarItem(
               icon: Padding(
-                padding: const EdgeInsets.only(right: 0),
-                child: SvgPicture.asset("assets/images/messageminus.svg",color: _currentIndex== 3 ? Theme.of(context).primaryColor : Colors.black),
-              ),
+                padding: const EdgeInsets.only(right: 16,left: 16),
+                child: Container(
+                  width: 100,
+                  height: 30,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Stack(children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Align(
+                              alignment: Alignment.center,
+                                child: SvgPicture.asset("assets/images/messageminus.svg",color: _currentIndex== 3 ? Theme.of(context).primaryColor : Colors.black)),
+                          ),
+                        ref.watch(isChatNotSeenProvider)
+                            ?Padding(
+                          padding: const EdgeInsets.only(left: 10,right:10,bottom: 14),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              height:8,width: 8,
+                              decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(100)
+                              ),
+
+                            ),
+                          ),
+                        ):SizedBox(),
+                      ],
+                      ),
+                    ],
+                  ),
+                )),
               label: '',
-            ),
+              ),
+
             BottomNavigationBarItem(
               icon: SvgPicture.asset("assets/images/Profile.svg",color: _currentIndex== 4 ? Theme.of(context).primaryColor : Colors.black),
               label: '',

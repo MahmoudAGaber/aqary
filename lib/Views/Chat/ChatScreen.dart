@@ -12,13 +12,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../ViewModel/ChatViewModel.dart';
+import '../../helper/Authentication.dart';
 import '../../helper/date_converter.dart';
 import '../../helper/file_picker.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   String chatRoomId;
-  String? senderName;
-   ChatScreen({super.key,required this.chatRoomId,this.senderName});
+  String? recipientId;
+  String? recipientName;
+  String? recipientPhone;
+   ChatScreen({super.key,required this.chatRoomId,this.recipientId, this.recipientName,this.recipientPhone});
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -26,6 +29,15 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   TextEditingController textMessageEditingController = TextEditingController();
+  FirebaseServices firebaseServices = FirebaseServices();
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      firebaseServices.markMessagesAsSeen(widget.chatRoomId, AuthService().auth.currentUser!.uid);
+
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,14 +60,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       },
                         child: Icon(Icons.arrow_back_ios)),
                     SizedBox(width: Dimensions.paddingSizeDefault,),
-                    ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(50)),
-                      child: Image.asset(
-                        "assets/images/profile.png",
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover ,
-                      ),
+                    // ClipRRect(
+                    //   borderRadius: BorderRadius.all(Radius.circular(50)),
+                    //   child: Image.asset(
+                    //     "assets/images/profile.png",
+                    //     width: 50,
+                    //     height: 50,
+                    //     fit: BoxFit.cover ,
+                    //   ),
+                    // ),
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
@@ -63,7 +79,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(FirebaseAuth.instance.currentUser!.phoneNumber!, style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600)),
+                          Text(widget.recipientName ?? widget.recipientPhone!, style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600)),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -187,11 +203,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                     decoration: InputDecoration(
                                       hintText: "اكتب شيئا الان ..",
                                       prefixIcon: IconButton(onPressed: (){
-                                        FilePickerHelper().pickFile(widget.chatRoomId,"Img").then((value){
+                                        FilePickerHelper().pickFile(widget.chatRoomId,"Img",widget.recipientId!,
+                                            widget.recipientName ??""
+                                            , widget.recipientPhone!).then((value){
                                           FirebaseServices().sendMessage(
                                               widget.chatRoomId,
                                               value,
-                                              "Img"
+                                              "Img",
+                                            widget.recipientId!,
+                                            widget.recipientName ?? "",
+                                              widget.recipientPhone!
                                           );
                                         });
                                       },
@@ -208,7 +229,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                       FirebaseServices().sendMessage(
                                           widget.chatRoomId,
                                         textMessageEditingController.text,
-                                        "Text"
+                                        "Text",
+                                          widget.recipientId!,
+                                          widget.recipientName ?? "",
+                                          widget.recipientPhone!
                                       );
                                       textMessageEditingController.clear();
 

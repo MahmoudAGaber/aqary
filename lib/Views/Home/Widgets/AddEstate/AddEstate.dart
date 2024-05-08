@@ -473,7 +473,7 @@ class _AddEstateState extends ConsumerState<AddEstate> {
                                           borderRadius: BorderRadius.circular(12),
                                           child: estateFiles[estateIndex].path.contains("mp4")
                                               ? VideoApp(path: estateFiles[estateIndex].path,)
-                                              :Image.file(File(estateFiles[estateIndex].path),fit: BoxFit.cover,),
+                                              :Image.file(File(estateFiles[estateIndex].path),fit: BoxFit.cover,width: 200,height: 180,),
                                         ),
                                       ),
                                     ),
@@ -590,7 +590,7 @@ class _AddEstateState extends ConsumerState<AddEstate> {
                                     paymentDuration:PaymentHelper.getArabicPaymentStyle(paymentSystem),
                                     videos: [],
                                     isAvailable: true,
-                                  isFavorite: false
+                                    isFavorite: false
                                 );
                                 Distinction().distinctionEstate(context,realStateModel,);
                               }

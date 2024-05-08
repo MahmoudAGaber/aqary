@@ -1,5 +1,4 @@
 
-
 import 'package:aqary/Models/RealStateModel.dart';
 import 'package:aqary/ViewModel/FavoritesViewModel.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
@@ -30,17 +29,31 @@ class Favourites extends ConsumerStatefulWidget {
 
 class _FavouritesState extends ConsumerState<Favourites> {
 
-
+  TextEditingController searchEditTextControllor = TextEditingController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.watch(favoritesProvider.notifier).getFavorites('desc', "favorite");
+      ref.read(favoritesFilterProvider.notifier).state = FavoritesFilter.recently;
+      ref.read(favoritesProvider.notifier).getFavorites(sortType: 'desc', sortby: "favorite");
     });
     super.initState();
+  }
+
+  String sortText(FavoritesFilter favoritesFilter){
+    switch(favoritesFilter){
+      case FavoritesFilter.asc:
+        return "الاقل سعر";
+      case FavoritesFilter.desc:
+        return "الاعلي سعر";
+      case FavoritesFilter.recently:
+        return "الاحدث";
+    }
   }
   @override
   Widget build(BuildContext context) {
     var favourites = ref.watch(favoritesProvider);
+    var favoritesFilter = ref.watch(favoritesFilterProvider);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar(
@@ -91,7 +104,7 @@ class _FavouritesState extends ConsumerState<Favourites> {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "الاحدث",
+                                      sortText( ref.watch(favoritesFilterProvider)),
                                       style:
                                       Theme.of(context).textTheme.titleMedium,
                                     ),
@@ -113,24 +126,38 @@ class _FavouritesState extends ConsumerState<Favourites> {
                 ),
                 onSuccess: (state) => Column(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomTextField(
-                            hintText: 'ابحث',
-                            isIcon: true,
-                            prefixIconUrl: CupertinoIcons.search,
-                            isShowPrefixIcon: true,
-                            inputAction: TextInputAction.search,
-                            isSearch: true,
-                            isShowBorder: true,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: Dimensions.paddingSizeLarge,
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: CustomTextField(
+                    //         controller: searchEditTextControllor,
+                    //         hintText: 'ابحث',
+                    //         isIcon: true,
+                    //         prefixIconUrl: CupertinoIcons.search,
+                    //         suffixIconUrl: Icons.clear,
+                    //         isShowPrefixIcon: true,
+                    //         isShowSuffixIcon: ref.watch(searchClearProvider),
+                    //         inputAction: TextInputAction.search,
+                    //         isSearch: true,
+                    //         isShowBorder: true,
+                    //         onChanged: (value){
+                    //           ref.read(favoritesProvider.notifier).getFavorites(sortType:favoritesFilter.name == "recently" ? "desc":favoritesFilter.name, sortby:favoritesFilter.name == "recently" ? "favorite": 'price',search: value);
+                    //           ref.read(searchClearProvider.notifier).state = true;
+                    //           print("${favourites.state}");
+                    //           },
+                    //         onSuffixTap: (){
+                    //           ref.read(favoritesProvider.notifier).getFavorites(sortType:favoritesFilter.name == "recently" ? "desc":favoritesFilter.name, sortby:favoritesFilter.name == "recently" ? "favorite": 'price',);
+                    //           ref.read(searchClearProvider.notifier).state = false;
+                    //           searchEditTextControllor.clear();
+                    //
+                    //         },
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    // SizedBox(
+                    //   height: Dimensions.paddingSizeLarge,
+                    // ),
                     Column(
                       children: [
                         Row(
@@ -150,7 +177,7 @@ class _FavouritesState extends ConsumerState<Favourites> {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "الاحدث",
+                                      sortText(ref.watch(favoritesFilterProvider)),
                                       style:
                                       Theme.of(context).textTheme.titleMedium,
                                     ),
@@ -166,7 +193,7 @@ class _FavouritesState extends ConsumerState<Favourites> {
                       ],
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height*.7,
+                      height: MediaQuery.of(context).size.height*.75,
                       child: ListView(
                         shrinkWrap: true,
                         children: [
@@ -177,7 +204,7 @@ class _FavouritesState extends ConsumerState<Favourites> {
 
                   ],
                 ),
-                onFailure: (state) => Row(
+                onFailure: (state) => favourites.state == DataState.EMPTY?SizedBox():Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
@@ -296,8 +323,9 @@ class _FavouritesState extends ConsumerState<Favourites> {
               activeColor: Colors.white,
               splashRadius: 30,
               onChanged: (bool? value) {
-                ref.read(favoritesFilterProvider.notifier).state = FavoritesFilter.values[index];
-                ref.read(favoritesProvider.notifier).getFavorites(favoritesFilter.name, favoritesFilter.name == "recently" ? "favorite": '');
+                print("${FavoritesFilter.values[index].name}");
+                 ref.read(favoritesFilterProvider.notifier).state = FavoritesFilter.values[index];
+                ref.read(favoritesProvider.notifier).getFavorites(sortType:FavoritesFilter.values[index].name == "recently" ? "desc":FavoritesFilter.values[index].name, sortby:FavoritesFilter.values[index].name == "recently" ? "favorite": 'price');
                 Navigator.pop(context);
 
               },

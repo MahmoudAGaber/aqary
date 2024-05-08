@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../helper/date_converter.dart';
 import '../../../utill/dimensions.dart';
 import 'EstateDetails.dart';
 import 'MoreEstatesFilter.dart';
@@ -18,7 +19,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 
 class MoreEstates extends ConsumerStatefulWidget {
-  const MoreEstates({super.key});
+  String? city;
+  MoreEstates({super.key,this.city});
 
   @override
   ConsumerState<MoreEstates> createState() => _MoreEstatesState();
@@ -33,7 +35,7 @@ class _MoreEstatesState extends ConsumerState<MoreEstates> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
 
-        ref.read(RealStateProvider.notifier).getRealStates(page: page, limit: 10);
+        ref.read(RealStateProvider.notifier).getRealStates(page: page, limit: 20,search: widget.city);
 
     });
     super.initState();
@@ -84,7 +86,7 @@ class _MoreEstatesState extends ConsumerState<MoreEstates> {
                if (notification is ScrollEndNotification && notification.metrics.extentAfter == 0) {
                  page++;
                  ref.read(loadingMoreProvider.notifier).state = true;
-                 ref.read(RealStateProvider.notifier).getRealStates(page: page,limit: 10).then((value){
+                 ref.read(RealStateProvider.notifier).getRealStates(page: page,limit: 20).then((value){
                    ref.read(loadingMoreProvider.notifier).state = false;
 
                  });
@@ -167,10 +169,7 @@ class _MoreEstatesState extends ConsumerState<MoreEstates> {
                                                ),
                                              ],
                                            ),
-                                           Text(
-                                             "${item.yearPrice} درهم / سنويا",
-                                             style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 10, color: Theme.of(context).primaryColor),
-                                           ),
+                                           Text("${DateConverter.numberFormat(item.yearPrice)} درهم / سنويا", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
                                          ],
                                        ),
                                      )
@@ -179,22 +178,28 @@ class _MoreEstatesState extends ConsumerState<MoreEstates> {
                                  Positioned(
                                    bottom: 10,
                                    left: 6,
-                                   child: Container(
-                                     decoration: BoxDecoration(
-                                       color: Colors.white,
-                                       borderRadius: BorderRadius.circular(50),
-                                       boxShadow: [
-                                         BoxShadow(
-                                           color: Color(0x19121212),
-                                           blurRadius: 10,
-                                           offset: Offset(4, 4),
-                                           spreadRadius: 0,
-                                         )
-                                       ],
-                                     ),
-                                     child: Padding(
-                                       padding: const EdgeInsets.all(5.0),
-                                       child: SvgPicture.asset("assets/images/heart2.svg"),
+                                   child: InkWell(
+                                     borderRadius: BorderRadius.circular(50),
+                                     onTap:(){
+                                       ref.read(RealStateProvider.notifier).addFavorite(item.id!);
+                                     },
+                                     child: Container(
+                                       decoration: BoxDecoration(
+                                         color: Colors.white,
+                                         borderRadius: BorderRadius.circular(50),
+                                         boxShadow: [
+                                           BoxShadow(
+                                             color: Color(0x19121212),
+                                             blurRadius: 10,
+                                             offset: Offset(4, 4),
+                                             spreadRadius: 0,
+                                           )
+                                         ],
+                                       ),
+                                       child: Padding(
+                                         padding: const EdgeInsets.all(5.0),
+                                           child: SvgPicture.asset("assets/images/heart2.svg",color: item.isFavorite? Colors.red : null,
+                                           ))
                                      ),
                                    ),
                                  ),

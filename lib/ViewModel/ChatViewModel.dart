@@ -7,6 +7,9 @@ import '../Models/ChatModel.dart';
 
 final isSearchTapProvider = StateProvider<bool>((ref) => false);
 
+final isChatNotSeenProvider = StateProvider<bool>((ref) => false);
+
+
 final messagesProvider = StateNotifierProvider<MessagesNotifier , List<Message>>((ref) => MessagesNotifier(ref));
 
 final searchUserProvider = StateNotifierProvider<searchUserNotifier , List<DocumentSnapshot>>((ref) => searchUserNotifier(ref));

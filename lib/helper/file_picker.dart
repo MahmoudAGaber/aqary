@@ -45,7 +45,7 @@ class FilePickerHelper {
   }
 
 
-   Future<String> pickFile(chatRoomId,messageType) async {
+   Future<String> pickFile(chatRoomId,messageType,recipientId,recipientName,recipientPhone) async {
     FirebaseServices firebaseServices = FirebaseServices();
     String? imageUrl;
     final result = await FilePicker.platform.pickFiles(
@@ -65,7 +65,7 @@ class FilePickerHelper {
           Uint8List uint8List = Uint8List.fromList(fileBytes);
           localImgUrl = uint8List;
 
-          FirebaseServices().sendMessage(chatRoomId, localImgUrl, messageType);
+          FirebaseServices().sendMessage(chatRoomId, localImgUrl, messageType,recipientId,recipientName,recipientPhone);
 
           imageUrl = await firebaseServices.uploadFile(uint8List, file.name);
         } else {

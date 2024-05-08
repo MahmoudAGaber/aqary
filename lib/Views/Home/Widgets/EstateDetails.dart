@@ -7,6 +7,7 @@ import 'package:aqary/Models/RealStateModel.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
 import 'package:aqary/Views/base/custom_shadow_view.dart';
 import 'package:aqary/data/StateModel.dart';
+import 'package:aqary/helper/date_converter.dart';
 import 'package:aqary/payment_configurations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../Models/ChatModel.dart';
 import '../../../ViewModel/RealStateViewModel.dart';
+import '../../../data/services/FiresbaseServices.dart';
+import '../../../helper/Authentication.dart';
 import '../../../utill/dimensions.dart';
+import '../../Chat/ChatScreen.dart';
 import '../../base/custom_button.dart';
 import '../../base/custom_imageView.dart';
 import '../MapView.dart';
@@ -67,7 +72,7 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
                       child: CustomShadowView(
                           borderRadius: 50,
                           padding: EdgeInsets.all(8),
-                          color: Theme.of(context).primaryColor,
+                          color: item.isFavorite ? Theme.of(context).primaryColor : Colors.grey,
                           isActive: true,
                           child: Icon(CupertinoIcons.heart_solid,size: 18,)),
                     )
@@ -142,7 +147,7 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
                             children: [
                               Text(item.title, style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w600)),
                               SizedBox(width: 4,),
-                              Text("${item.yearPrice} درهم / سنويا", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor),),
+                              Text("${DateConverter.numberFormat(item.yearPrice)} درهم / سنويا", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor),),
                             ],
                           ),
                           SizedBox(height: 8,),
@@ -214,7 +219,13 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
                                       )
                                     ],
                                   ),
-                                  SvgPicture.asset('assets/images/messageminus.svg')
+                                  InkWell(
+                                    onTap: ()async{
+                                      String chatRoomId = await FirebaseServices().createChatRoom(AuthService().auth.currentUser!.uid, item.createdBy['firebase_id'], Message().toJson());
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) => ChatScreen(chatRoomId: chatRoomId,recipientId: item.createdBy['firebase_id'],recipientName: item.createdBy['name']??"",recipientPhone: item.createdBy['phone'],)));
+                                    },
+                                      child: SvgPicture.asset('assets/images/messageminus.svg'))
                                 ],
                               ),
                             ),
@@ -396,6 +407,7 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
                     borderRadius: 12,
                     textColor: Colors.white,
                     onPressed: (){
+
                     }
                 ),
               ),

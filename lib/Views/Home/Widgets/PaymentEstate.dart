@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:aqary/Views/base/custom_app_bar.dart';
 import 'package:aqary/data/StateModel.dart';
+import 'package:aqary/helper/date_converter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -183,7 +184,7 @@ class _PaymentEstateState extends ConsumerState<PaymentEstate> {
                                             ],
                                           ),
                                           Text(
-                                            "${property.data!.data.yearPrice} درهم / سنويا",
+                                            "${DateConverter.numberFormat(property.data!.data.yearPrice)} درهم / سنويا",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall!

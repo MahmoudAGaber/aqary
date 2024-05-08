@@ -239,7 +239,7 @@ class _RentState extends ConsumerState<OwnerCTSignature> {
                                         ],
                                       ),
                                       Text(
-                                        "${property.data!.data.yearPrice} درهم / سنويا",
+                                        "${DateConverter.numberFormat(property.data!.data.yearPrice)} درهم / سنويا",
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodySmall!

@@ -42,6 +42,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      print("OGBABY${widget.pic}");
       if(widget.userName !=null){
         userNameEditController.text = widget.userName!;
       }
@@ -72,15 +73,18 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                     height: 100,width: 100,
                     child: Stack(
                       children: [
-                        userProfile.path.isNotEmpty
-                            ?ClipRRect(
+                        ClipRRect(
                           borderRadius: BorderRadius.circular(50),
-                            child: Image.file(File(userProfile.path),fit: BoxFit.cover,height: 100,width: 100,))
-                            :SizedBox(
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey,
-                          ),
+                            child: userProfile.path.isNotEmpty
+                                ? Image.file(File(userProfile.path),fit: BoxFit.cover,height: 100,width: 100,)
+                                : widget.pic!.isNotEmpty
+                                ?Image.network(widget.pic!,fit: BoxFit.cover,height: 100,width: 100,)
+                                :SizedBox(
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.grey,
+                              ),
+                            ),
                         ),
                         Positioned(
                           bottom: 2,

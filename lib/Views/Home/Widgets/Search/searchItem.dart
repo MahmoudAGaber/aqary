@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../../ViewModel/UserViewModel.dart';
+import '../../../../helper/date_converter.dart';
 import '../../../../utill/dimensions.dart';
 import '../EstateDetails.dart';
 
@@ -91,7 +93,7 @@ class _SearchItemState extends ConsumerState<SearchItem> {
                                     ),
                                   ],
                                 ),
-                                Text("${item.yearPrice} درهم / سنويا", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
+                                Text("${DateConverter.numberFormat(item.yearPrice)} درهم / سنويا", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
 
 
 
@@ -116,9 +118,15 @@ class _SearchItemState extends ConsumerState<SearchItem> {
                               )
                             ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: SvgPicture.asset("assets/images/heart2.svg",
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(50),
+                            onTap: (){
+                              ref.read(SearchProvider.notifier).addFavorite(item.id!,);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: SvgPicture.asset("assets/images/heart2.svg",color: item.isFavorite? Colors.red : null,
+                              ),
                             ),
                           ),
                         ),

@@ -129,6 +129,7 @@ class UserLocationNotifier extends StateNotifier<LocationData?> {
       );
 
       state = locationData;
+      print("OKDKD${state!.longtude} ${state!.latitude}");
 
       return state!;
     } catch (e) {

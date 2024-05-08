@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:aqary/ViewModel/RealStateViewModel.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
 import 'package:aqary/Views/base/custom_button.dart';
+import 'package:aqary/helper/date_converter.dart';
 import 'package:aqary/helper/file_picker.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,8 +16,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../Models/RealStateModel.dart';
 import '../../ViewModel/LocationViewModel.dart';
+import '../../helper/payment_helper.dart';
 import '../Home/MapView.dart';
 import '../VideoPlayer.dart';
+import '../base/custom_dialog.dart';
 
 
 
@@ -42,6 +45,19 @@ class _EditEstateState extends ConsumerState<EditEstate> {
 
   CameraPosition? kGooglePlex;
 
+  PaymentsSystem paymentDuration(String text){
+    if(text == 'half_annual'){
+      return PaymentsSystem.Semi_annually;
+    }
+    else if(text == 'Quarterly'){
+      return PaymentsSystem.Quarterly;
+    }
+    else if(text == 'monthly'){
+      return PaymentsSystem.monthly;
+    }
+    return PaymentsSystem.annually;
+  }
+
 @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -49,11 +65,11 @@ class _EditEstateState extends ConsumerState<EditEstate> {
       estateNameController.text = widget.realStateModel.title;
       estateAddressController.text = widget.realStateModel.location;
       estateDescriptionController.text = widget.realStateModel.description;
-      estatePriceController.text = widget.realStateModel.yearPrice.toString();
+      estatePriceController.text = DateConverter.numberFormat(widget.realStateModel.yearPrice).toString();
       ref.read(bedRoomNumbersProvider.notifier).state = widget.realStateModel.bedroomsCount;
       ref.read(bathroomNumbersProvider.notifier).state = widget.realStateModel.bathroomsCount;
       ref.read(estateTypeProvider.notifier).state = widget.realStateModel.type == 'appartment' ? EstateType.department: EstateType.villa;
-      ref.read(paymentsSystemProvider.notifier).state = widget.realStateModel.paymentDuration == "half_annual" ? PaymentsSystem.Semi_annually:PaymentsSystem.Semi_annually;
+      ref.read(paymentsSystemProvider.notifier).state = paymentDuration(widget.realStateModel.paymentDuration!);
       ref.read(RealStateEditProvider.notifier).getEstateFiles(widget.realStateModel.images);
       kGooglePlex = CameraPosition(
         target: LatLng(widget.realStateModel.lat, widget.realStateModel.long),
@@ -583,6 +599,41 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                 height: 50,
                                 borderRadius: 12,
                                 onPressed: (){
+                                  if(_formKey.currentState!.validate()){
+                                    if(estateFiles.isNotEmpty){
+                                      if(estateLocation.latitude !=null || estateLocation.longtude != null || estateLocation.placemark !=null){
+                                        var realStateModel = RealStateModel(
+                                            title: estateNameController.text,
+                                            images: estateFiles.cast<File>(),
+                                            bathroomsCount: bathroomNumbers,
+                                            bedroomsCount: bedroomNumbers,
+                                            country: estateLocation.placemark!.country!,
+                                            city:  estateLocation.placemark!.locality!,
+                                            yearPrice: estatePriceController.text,
+                                            type: estateType.name,
+                                            location: estateAddressController.text,
+                                            long: estateLocation.longtude!,
+                                            lat: estateLocation.latitude!,
+                                            description: estateDescriptionController.text,
+                                            paymentDuration:PaymentHelper.getArabicPaymentStyle(paymentSystem),
+                                            videos: [],
+                                            isAvailable: true,
+                                            isFavorite: false,
+                                          promotion: widget.realStateModel.promotion
+                                        );
+
+                                        ref.read(RealStateProvider.notifier).editRealState(realStateModel,realStateModel.toJson());
+
+                                        showAnimatedDialog(
+                                            context, dismissible: false, estateEdited()
+                                        );
+                                      }
+
+                                    }
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("قم بادخال مرفقات العقار",style: TextStyle(color: Colors.black),) ));
+
+                                  }
+                                  print(estateFiles);
                                 }
                             ),
                             SizedBox(height: Dimensions.paddingSizeDefault,),
@@ -597,6 +648,50 @@ class _EditEstateState extends ConsumerState<EditEstate> {
     );
   }
 
+  Widget estateEdited(){
+    return Dialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      insetPadding: EdgeInsets.zero,
+      child: Builder(
+        builder: (BuildContext dialogContext){
+          return  Container(
+            height: MediaQuery.of(dialogContext).size.height*.38,
+            width: MediaQuery.of(dialogContext).size.width*.9,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 185,
+                  width: 185,
+                  child: Stack(
+                    children: [
+                      SvgPicture.asset("assets/images/Ellipse2.svg",colorFilter: ColorFilter.linearToSrgbGamma(),),
+                      Center(child: SvgPicture.asset("assets/images/Ellipse2.svg",height: 150,width: 150,)),
+                      Center(child: Container(width: 80,height:80,decoration: BoxDecoration(color: Theme.of(dialogContext).primaryColor,borderRadius: BorderRadius.circular(50)),)),
+                      Center(child: Text("✓",style: Theme.of(dialogContext).textTheme.titleLarge!.copyWith(fontSize: 22,color: Colors.white),)),
+
+                    ],
+                  ),),
+                Text('سيتم تعديل الأعلان',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(dialogContext).textTheme.titleLarge!.copyWith(fontSize: 20),),
+                SizedBox(height: Dimensions.paddingSizeLarge,),
+                CustomButton(
+                    buttonText: "تم",
+                    height: 50,
+                    width: 200,
+                    textColor: Colors.white,
+                    borderRadius: 12,
+                    onPressed: (){
+                      Navigator.pop(context);
+                    }
+                ),
+              ],
+            ),);
+        },
+      ),
+    );
+  }
   List<String> paymentsSystemTxt = [
     "سنوي",
     "نصف سنوي",

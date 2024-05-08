@@ -37,8 +37,9 @@ class _HomeState extends ConsumerState<Home> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       ref.watch(bannerProvider.notifier).getBanners();
       ref.watch(categoryProvider.notifier).getCategories();
-      ref.watch(NotificationProvider.notifier).getNotifications();
-      ref.watch(favoritesProvider.notifier).getFavorites('desc','favorite');
+      await ref.watch(NotificationProvider.notifier).getNotifications();
+      ref.read(notificationsCountProvider.notifier).state = ref.watch(NotificationProvider.notifier).notificationCount();
+      ref.watch(favoritesProvider.notifier).getFavorites(sortType: 'desc',sortby: 'favorite');
       ref.read(UserProvider.notifier).getUserInfo();
       ref.read(nearByProvider.notifier).nearByEstate();
       FirebaseServices().fetchUsers();

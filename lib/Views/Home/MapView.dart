@@ -132,14 +132,14 @@ class _MapViewState extends ConsumerState<MapView> {
                     CustomButton(
                         buttonText: "تأكيد الموقع",
                         textColor: Colors.white,
-                        onPressed: (){
+                        onPressed: ()async{
                           if(widget.isUserLocation){
-                            ref.read(userLocationProvider.notifier).changeCurrentUserLocation(LatLng(addressSelected!.latitude!, addressSelected.longtude!));
+                           await ref.read(userLocationProvider.notifier).changeCurrentUserLocation(LatLng(addressSelected!.latitude!, addressSelected.longtude!));
                           }else{
                             ref.read(estatelocationProvider.notifier).changeCurrentEstateLocation(LatLng(estateAddressSelected!.latitude!, estateAddressSelected.longtude!));
 
                           }
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Homepage(page: 0)));
+                          Navigator.pop(context);
                     })
                   ],
                 )

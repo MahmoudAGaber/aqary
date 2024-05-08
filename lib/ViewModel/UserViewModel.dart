@@ -18,6 +18,9 @@ final EstateManagerProvider = StateNotifierProvider<EstateManagerNotifier, List<
 
 final estateSelectionProvider = StateProvider.family<bool, int>((ref, index) => false);
 
+final contractEstateSelectionProvider = StateProvider<int>((ref) => -1);
+
+
 final updateUserLoadingProvider = StateProvider<bool>((ref) => false);
 
 final userPropSelectionProvider = StateProvider<UserProp>((ref) => UserProp.all);
@@ -68,6 +71,45 @@ class UserNotifier extends StateNotifier<StateModel<UserModel>> {
       state = StateModel.fail('SHIT');
     }
 
+  }
+
+  Future<void> addFavorite(String id,String type)async {
+    RequestHandler requestHandler = RequestHandler();
+    List<RealStateModel> realEstateTemp = [];
+    UserModel? userModel;
+
+    try {
+      requestHandler.getData(
+        endPoint: '/properties/$id/favorite',
+        auth: true,
+        fromJson: (json) => Map(),
+      );
+
+      realEstateTemp.clear();
+      if(type == 'recent'){
+        realEstateTemp = state.data!.recentlySeen;
+
+      }else if(type == 'prop'){
+        realEstateTemp = state.data!.properties;
+
+      }
+
+      for(var item in realEstateTemp){
+        if(item.id == id){
+          item.isFavorite = !item.isFavorite;
+          print("WELLDONE");
+        }
+
+
+      }
+      UserModel? userModel = state.data;
+      userModel!.recentlySeen = realEstateTemp;
+      state = StateModel.success(userModel);
+
+
+    } catch (e) {
+      print("ErrorToAddToFavorites$e");
+    }
   }
 }
 

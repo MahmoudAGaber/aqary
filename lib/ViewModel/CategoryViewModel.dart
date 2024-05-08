@@ -37,6 +37,41 @@ class CategoryNotifier extends StateNotifier<StateModel<List<CategoryModel>>>{
       state = StateModel.fail("Error in data");
     }
   }
+
+  Future<void> addFavorite(String id,int index)async {
+    RequestHandler requestHandler = RequestHandler();
+    Map<String, dynamic> message;
+    List<CategoryModel> categoryTemp = [];
+
+    try {
+      message = await requestHandler.getData(
+        endPoint: '/properties/$id/favorite',
+        auth: true,
+        fromJson: (json) => Map(),
+      );
+
+      if(message['messages'] == "Updated!"){
+        print(message['message']);
+      }
+      categoryTemp.clear();
+      categoryTemp = state.data!;
+
+      for(var item in categoryTemp){
+        for(var pro in item.properties){
+          if(pro.id == id){
+            pro.isFavorite = !pro.isFavorite;
+            print("WELLDONE");
+          }
+        }
+
+      }
+      state = StateModel.success(categoryTemp);
+
+
+    } catch (e) {
+      print("ErrorToAddToFavorites$e");
+    }
+  }
 }
 
 
@@ -48,7 +83,7 @@ class nearByNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
     RequestHandler requestHandler = RequestHandler();
     List<RealStateModel> properties;
     double? lat =  ref.watch(userLocationProvider)!.latitude;
-    double? long =  (ref.watch(userLocationProvider)!.longtude)!+1;
+    double? long =  (ref.watch(userLocationProvider)!.longtude);
 
     if (!mounted) return;
     try {
@@ -57,7 +92,9 @@ class nearByNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
         'sort_by' : "distance",
         'sort_type':'asc',
         'lat': lat,
-        'long': long
+        'long': long,
+        'page':1,
+        'limit':20
       };
       queryParams.removeWhere((key, value) => value == null || value == '');
       print("SHITTT");
@@ -82,6 +119,36 @@ class nearByNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
       state = StateModel.fail("Error in data");
     }
 
+  }
+
+  Future<void> addFavorite(String id)async {
+    RequestHandler requestHandler = RequestHandler();
+    List<RealStateModel> realEstateTemp = [];
+
+    try {
+       requestHandler.getData(
+        endPoint: '/properties/$id/favorite',
+        auth: true,
+        fromJson: (json) => Map(),
+      );
+
+      realEstateTemp.clear();
+       realEstateTemp = state.data!;
+
+      for(var item in realEstateTemp){
+          if(item.id == id){
+            item.isFavorite = !item.isFavorite;
+            print("WELLDONE");
+          }
+
+
+      }
+      state = StateModel.success(realEstateTemp);
+
+
+    } catch (e) {
+      print("ErrorToAddToFavorites$e");
+    }
   }
 
 }

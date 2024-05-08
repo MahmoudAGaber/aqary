@@ -93,6 +93,7 @@ class _RentState extends ConsumerState<Rent> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       todayDate = DateConverter.slotDate(DateTime.now());
+      ownerEstateEditingController.text = widget.property.createdBy['name'];
     });
     super.initState();
   }
@@ -104,7 +105,7 @@ class _RentState extends ConsumerState<Rent> {
     var signature = ref.watch(signatureProvider);
     print(signature);
     paymentSystemEditingController.text =
-    "الدفعة ${PaymentHelper.getPayment(widget.property.yearPrice, paymentSystem)}";
+    "الدفعة ${PaymentHelper.getPayment(DateConverter.numberFormat(widget.property.yearPrice), paymentSystem)}";
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -214,7 +215,7 @@ class _RentState extends ConsumerState<Rent> {
                                 ],
                               ),
                               Text(
-                                "${widget.property.yearPrice} درهم / سنويا",
+                                "${DateConverter.numberFormat(widget.property.yearPrice)} درهم / سنويا",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
@@ -247,6 +248,7 @@ class _RentState extends ConsumerState<Rent> {
                             height: Dimensions.paddingSizeSmall,
                           ),
                           TextFormField(
+                            enabled: false,
                             controller: ownerEstateEditingController,
                             textDirection: ui.TextDirection.rtl,
                             cursorColor: Colors.grey,

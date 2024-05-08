@@ -3,6 +3,7 @@
 import 'package:aqary/Models/RealStateModel.dart';
 import 'package:aqary/ViewModel/CategoryViewModel.dart';
 import 'package:aqary/data/StateModel.dart';
+import 'package:aqary/helper/date_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,13 +15,20 @@ import 'EstateDetails.dart';
 import 'MoreEstates.dart';
 
 class EstateNearYou extends ConsumerStatefulWidget {
-  const EstateNearYou({super.key});
+  const
+
+  EstateNearYou({super.key});
 
   @override
   ConsumerState<EstateNearYou> createState() => _EstateNearYouState();
 }
 
 class _EstateNearYouState extends ConsumerState<EstateNearYou> {
+  @override
+  void initState() {
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     var nearBy = ref.watch(nearByProvider);
@@ -66,7 +74,7 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
 
                       },
                       child: Container(
-                        height: 112,
+                        height: 120,
                         child: Card(
                           color: Colors.white,
                           child: Stack(
@@ -76,7 +84,7 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                                 // crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 2),
+                                    padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
                                     child: InkWell(
                                       onTap: (){
                                         // Navigator.push(context, MaterialPageRoute(builder: (context)=>EstateDetails()));
@@ -89,7 +97,7 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                                             :Image.network(
                                           item.images.first.path,
                                           width: 132,
-                                          height: 88,
+                                          height: 105,
                                           fit: BoxFit.cover ,
                                         ),
                                       ),
@@ -98,6 +106,7 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 12),
                                     child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(item.title, style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600)),
@@ -136,7 +145,7 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                                           ],
                                         ),
                                         SizedBox(height: 3,),
-                                        Text("${item.yearPrice} درهم / سنويا", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
+                                        Text("${DateConverter.numberFormat(item.yearPrice)} درهم / سنويا", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
 
 
 
@@ -148,22 +157,29 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                               Positioned(
                                 bottom: 10,
                                 left: 6,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(50),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x19121212),
-                                        blurRadius: 10,
-                                        offset: Offset(4, 4),
-                                        spreadRadius: 0,
-                                      )
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: SvgPicture.asset("assets/images/heart2.svg",
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(50),
+                                  onTap: (){
+                                    ref.read(nearByProvider.notifier).addFavorite(item.id!);
+
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0x19121212),
+                                          blurRadius: 10,
+                                          offset: Offset(4, 4),
+                                          spreadRadius: 0,
+                                        )
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: SvgPicture.asset("assets/images/heart2.svg",color: item.isFavorite? Colors.red : null,
+                                      ),
                                     ),
                                   ),
                                 ),

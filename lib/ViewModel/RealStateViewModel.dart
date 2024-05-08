@@ -51,29 +51,22 @@ class RealStateNotifier extends StateNotifier<List<RealStateModel>>{
   Ref ref;
   RealStateNotifier(this.ref):super([]);
 
-  void addRealState( RealStateModel? data){
-    Map<String, String> dataToJSon= {
-      'title':data!.title,
-      'bedrooms_count': data.bedroomsCount.toString(),
-      'bathrooms_count':data.bathroomsCount.toString(),
-      'price': data.yearPrice,
-      'country':data.country,
-      'city': data.city,
-      'type':data.type,
-      'location': data.location,
-      'long':data.long.toString(),
-      'lat': data.lat.toString(),
-      'description':data.description,
-      'payment_duration': data.paymentDuration.toString(),
-      'promotion':data.promotion.toString(),
-      'is_available': data.isAvailable.toString(),
-
-    };
+  void addRealState(RealStateModel? data,Map<String,String>requestBody){
     RequestHandler requestHandler = RequestHandler();
     requestHandler.postAnotherData(
       endPoint: "/properties",
         auth: true,
-        requestBody: dataToJSon,
+        requestBody: requestBody,
+        model: data
+    );
+  }
+
+  void editRealState(RealStateModel? data,Map<String,String>requestBody){
+    RequestHandler requestHandler = RequestHandler();
+    requestHandler.postAnotherData(
+        endPoint: "/properties",
+        auth: true,
+        requestBody: requestBody,
         model: data
     );
   }
@@ -137,10 +130,41 @@ class RealStateNotifier extends StateNotifier<List<RealStateModel>>{
         properties = [...state, ...propertiesTemp];
       }
 
+
         state = [...properties];
 
 
 
+  }
+
+  Future<void> addFavorite(String id)async {
+    RequestHandler requestHandler = RequestHandler();
+    List<RealStateModel> realEstateTemp = [];
+
+    try {
+      requestHandler.getData(
+        endPoint: '/properties/$id/favorite',
+        auth: true,
+        fromJson: (json) => Map(),
+      );
+
+      realEstateTemp.clear();
+      realEstateTemp = state;
+
+      for(var item in realEstateTemp){
+        if(item.id == id){
+          item.isFavorite = !item.isFavorite;
+          print("WELLDONE");
+        }
+
+
+      }
+      state = [...realEstateTemp];
+
+
+    } catch (e) {
+      print("ErrorToAddToFavorites$e");
+    }
   }
 }
 
@@ -154,7 +178,7 @@ class RealStateGetOneNotifier extends StateNotifier<StateModel<RealStateResponse
     try {
       state = StateModel.loading();
       realStateResponse = await requestHandler.getData(
-        endPoint: "/properties/$id?lat=${ref.watch(userLocationProvider)!.latitude}&long=${ref.watch(userLocationProvider)!.latitude}",
+        endPoint: "/properties/$id?lat=${ref.watch(userLocationProvider)!.latitude}&long=${ref.watch(userLocationProvider)!.longtude}",
         auth: true,
         fromJson: (json) => RealStateResponse.fromJson(json),);
 

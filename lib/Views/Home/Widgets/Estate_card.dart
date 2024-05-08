@@ -2,6 +2,7 @@
 
 import 'package:aqary/Models/RealStateModel.dart';
 import 'package:aqary/ViewModel/CategoryViewModel.dart';
+import 'package:aqary/helper/date_converter.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +71,7 @@ class _EstateCardState extends ConsumerState<EstateCard> {
                                 children: [
                                   Text("${item.title}", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600)),
                                   SizedBox(height: 4,),
-                                  Text("${item.yearPrice} درهم / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
+                                  Text("${DateConverter.numberFormat(item.yearPrice)} درهم / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
                                   SizedBox(height: 4,),
                                   Row(
                                     children: [
@@ -114,13 +115,13 @@ class _EstateCardState extends ConsumerState<EstateCard> {
                               ],
                             ),
                             child: InkWell(
+                              borderRadius: BorderRadius.circular(50),
                               onTap: (){
-                                ref.read(favoritesProvider.notifier).addFavorite(widget.properties![index].id!);
-                                ref.read(categoryProvider.notifier).getCategories();
+                                ref.read(categoryProvider.notifier).addFavorite(widget.properties![index].id!,index);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(5.0),
-                                child: SvgPicture.asset("assets/images/heart2.svg",color: item.isFavorite!? Colors.red : null,
+                                child: SvgPicture.asset("assets/images/heart2.svg",color: item.isFavorite? Colors.red : null,
                                 ),
                               ),
                             ),

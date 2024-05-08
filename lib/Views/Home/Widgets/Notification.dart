@@ -228,13 +228,17 @@ class _NotificationsState extends ConsumerState<Notifications> {
                     ],
                   ),
                   InkWell(
-                    onTap: (){
+                    onTap: ()async{
+
                       if(notificationItem.title.contains("request")){
                         Navigator.push(context, MaterialPageRoute(builder: (context)=> OwnerCTSignature(contractId: notificationItem.contract,)));
-
                       }else if(notificationItem.title.contains("accepted")){
                         Navigator.push(context, MaterialPageRoute(builder: (context)=> PaymentEstate(contractId: notificationItem.contract,)));
+
                       }
+                      await ref.read(NotificationProvider.notifier).readOneNotifications(notificationItem.id);
+                       ref.watch(NotificationProvider.notifier).notificationCount();
+
                     },
                     child: RichText(
                         text: TextSpan(

@@ -10,7 +10,9 @@ import 'package:aqary/Views/Profile/EditProfile.dart';
 import 'package:aqary/Views/Profile/EditRealState.dart';
 import 'package:aqary/Views/Profile/Settings.dart';
 import 'package:aqary/data/StateModel.dart';
+import 'package:aqary/helper/date_converter.dart';
 import 'package:aqary/utill/dimensions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -82,7 +84,7 @@ class _ProfileState extends ConsumerState<Profile> {
                                 right: 2,
                                 child: InkWell(
                                     onTap: (){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfile(userName: user.data!.name,)));
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfile(userName: user.data!.name,pic: user.data!.pic,)));
                                     },
                                     child: Container(
                                         height: 30,width: 30,
@@ -261,7 +263,7 @@ class _ProfileState extends ConsumerState<Profile> {
                                                           borderRadius: BorderRadius.circular(12),),
                                                         child: Padding(
                                                           padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 4),
-                                                          child: Text("${item.yearPrice} / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Colors.white),),
+                                                          child: Text("${DateConverter.numberFormat(item.yearPrice)} / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Colors.white),),
                                                         ),
                                                       ),
                                                     ),
@@ -286,12 +288,14 @@ class _ProfileState extends ConsumerState<Profile> {
                                                         SizedBox(
                                                           width: Dimensions.paddingSizeExtraSmall,
                                                         ),
-                                                        Text(
-                                                          "${item.country}, ${item.city}",
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .bodySmall!
-                                                              .copyWith(fontSize: 10,color: Theme.of(context).primaryColor),
+                                                        Flexible(
+                                                          child: Text(
+                                                            "${item.country}, ${item.city}",
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .bodySmall!
+                                                                .copyWith(fontSize: 10,color: Theme.of(context).primaryColor),
+                                                          ),
                                                         ),
                                                       ],
                                                     )

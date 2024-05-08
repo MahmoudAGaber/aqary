@@ -45,15 +45,6 @@ class SearchNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
   Ref ref;
   SearchNotifier(this.ref): super(StateModel.loading());
 
-
-  void searchfavoritetoggle(index, WidgetRef ref){
-    ref.read(favoriteSearchRecentlyProvider(index).notifier).update((state) => !state);
-    Future.delayed(Duration(seconds: 2),(){
-      ref.watch(favoriteSearchRecentlyProvider(index).notifier).state = ref.watch(SearchProvider).data![index].isFavorite!;
-    });
-
-  }
-
   Future<void> getSearch(searchKey)async {
     RequestHandler requestHandler = RequestHandler();
     List<RealStateModel> properties;
@@ -117,6 +108,34 @@ class SearchNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
       state = StateModel.fail("Error in data");
     }
 
+  }
+
+  Future<void> addFavorite(String id)async {
+    RequestHandler requestHandler = RequestHandler();
+    List<RealStateModel> realEstateTemp = [];
+
+    try {
+      requestHandler.getData(
+        endPoint: '/properties/$id/favorite',
+        auth: true,
+        fromJson: (json) => Map(),
+      );
+
+      realEstateTemp.clear();
+      realEstateTemp = state.data!;
+
+      for(var item in realEstateTemp){
+        if(item.id == id){
+          item.isFavorite = !item.isFavorite;
+          print("WELLDONE");
+        }
+      }
+      state = StateModel.success(realEstateTemp);
+
+
+    } catch (e) {
+      print("ErrorToAddToFavorites$e");
+    }
   }
 
   Future<void> clearSearch()async {

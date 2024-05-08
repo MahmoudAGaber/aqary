@@ -34,10 +34,10 @@ class RealStateModel {
   final String? createdAt;
   final String? updatedAt;
   final int? v;
-  final bool isFavorite;
+  bool isFavorite;
   final dynamic createdBy;
   final List<dynamic>? managers;
-  final double? distance;
+  final dynamic? distance;
 
 
   RealStateModel({
@@ -100,29 +100,29 @@ class RealStateModel {
   }
 
 
-  Map<String, dynamic> toJson() {
+  Map<String, String> toJson() {
     return {
       'title': title,
-      'images': images.map((image) => image.path).toList(),
-      'bathrooms_count': bathroomsCount,
-      'bedrooms_count': bedroomsCount,
+      //'images': images.map((image) => image.path).toList(),
+      'bathrooms_count': bathroomsCount.toString(),
+      'bedrooms_count': bedroomsCount.toString(),
       'country': country,
       'city': city,
       'price': yearPrice,
       'type': type,
       'location': location,
-      'long': long,
-      'lat': lat,
+      'long': long.toString(),
+      'lat': lat.toString(),
       'description': description,
-      'payment_duration': paymentDuration,
-      'videos': videos.map((video) => video.path).toList(),
-      'promotion': promotion,
-      'is_available': isAvailable,
-      'id': id,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      'v': v,
-      'isFavorite': isFavorite,
+      'payment_duration': paymentDuration.toString(),
+      //'videos': videos.map((video) => video.path).toList(),
+      //'promotion': promotion.toString(),
+      'is_available': isAvailable.toString(),
+     // 'id': id,
+     // 'createdAt': createdAt,
+      //'updatedAt': updatedAt,
+      //'v': v,
+      //'isFavorite': isFavorite,
     };
   }
 
@@ -181,18 +181,24 @@ class RealStateModel {
 class CreatedBy {
   final String? name;
   final String? phone;
+  final String? avatar;
+  final String? firebase_id;
 
   CreatedBy({
      this.name,
      this.phone,
+    this.avatar,
+    this.firebase_id
   });
 
   // Method to create a CreatedBy instance from JSON
   factory CreatedBy.fromJson(Map<String, dynamic>? json) {
     if (json != null) {
       return CreatedBy(
-          name: json['name'] ?? '', // Provide default empty string if null
-          phone: json['phone'] ?? '' // Provide default empty string if null
+          name: json['name'] ?? '',
+          phone: json['phone'] ?? '',
+          avatar: json['avatar'] ?? '',
+          firebase_id: json['firebase_id'] ?? ''
       );
     } else {
       return CreatedBy();

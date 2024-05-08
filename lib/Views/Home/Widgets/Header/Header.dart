@@ -6,11 +6,13 @@ import 'package:aqary/Views/base/custom_text_field.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../ViewModel/LocationViewModel.dart';
+import '../../../../ViewModel/NotificationViewModel.dart';
 import '../EstateOwner.dart';
 import '../Notification.dart';
 import '../Search/Search.dart';
@@ -33,13 +35,15 @@ class _HeaderState extends ConsumerState<Header> {
   ];
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp)async {
+
     });
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     var currentLocation = ref.watch(userLocationProvider);
+    var notificationcount =  ref.watch(notificationsCountProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 20,right: Dimensions.paddingSizeDefault,left: Dimensions.paddingSizeDefault),
       child: Column(
@@ -125,16 +129,44 @@ class _HeaderState extends ConsumerState<Header> {
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context)=> Notifications()));
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border.all(color: Colors.black12)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Icon(
-                          Icons.notifications_none,
-                          size: 26,
-                        ),
+                    child: SizedBox(
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border.all(color: Colors.black12)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Icon(
+                                  Icons.notifications_none,
+                                  size: 26,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              height: notificationcount! < 99 ? 18 :25,width: notificationcount! < 99 ? 18 :25,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(100)
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Center(
+                                  child: Text("$notificationcount",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white,fontSize: 11)
+
+                                  ),
+                                ),
+                              )
+                            ),
+                          )
+
+                        ],
                       ),
                     ),
                   )

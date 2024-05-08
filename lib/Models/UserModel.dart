@@ -5,12 +5,12 @@ class UserModel {
   final String id;
   final String firebaseId;
   final String phone;
-  final List<RealStateModel> favorites;
+  List<RealStateModel> favorites;
   final List<String> recentLocations;
-  final List<RealStateModel> properties;
+  List<RealStateModel> properties;
   final String deviceToken;
   final List<String> searchHistory;
-  final List<RealStateModel> recentlySeen;
+  List<RealStateModel> recentlySeen;
   final String name;
   final bool notificationEnabled;
   final String pic;

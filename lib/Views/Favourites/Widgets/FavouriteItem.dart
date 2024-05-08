@@ -2,6 +2,7 @@
 
 
 
+import 'package:aqary/helper/date_converter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,23 +16,45 @@ import '../../../ViewModel/CategoryViewModel.dart';
 import '../../../ViewModel/FavoritesViewModel.dart';
 import '../../Home/Widgets/EstateDetails.dart';
 
-class FavouriteItem extends ConsumerWidget {
+class FavouriteItem extends ConsumerStatefulWidget {
   List<RealStateModel>? properties;
   FavouriteItem({super.key,this.properties});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FavouriteItem> createState() => _FavouriteItemState();
+}
+
+class _FavouriteItemState extends ConsumerState<FavouriteItem> {
+  int lenght = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+    var favourites = ref.watch(favoritesProvider);
     return ListView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
-        itemCount: properties!.length,
+        itemCount: favourites.data!.length,
         scrollDirection: Axis.vertical,
         physics: ScrollPhysics(),
         itemBuilder: (context,index){
-          var item = properties![index];
+          var item = favourites.data![index];
           return Dismissible(
-            key: Key("unique_key"),
+            key: Key(item.id!),
             direction: DismissDirection.endToStart,
+            onDismissed: (DismissDirection direction)async{
+                await ref.read(favoritesProvider.notifier).removeFavorite(item.id!);
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('تم مسح العقار من المفضلة',style: TextStyle(color: Colors.black),),duration: Duration(seconds: 1),),
+                );
+            },
+            confirmDismiss: (direction) {
+              return Future.value(direction == DismissDirection.endToStart);
+            },
             background: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -45,6 +68,7 @@ class FavouriteItem extends ConsumerWidget {
                     child: Icon(CupertinoIcons.delete,color: Colors.white,size: 26,),
                   )),
             ),
+
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 1),
               child: Card(
@@ -110,7 +134,7 @@ class FavouriteItem extends ConsumerWidget {
                                     ),
                                   ],
                                 ),
-                                Text("${item.yearPrice} درهم / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
+                                Text("${DateConverter.numberFormat(item.yearPrice)} درهم / سنويا ", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize:10, color: Theme.of(context).primaryColor),),
 
 
 
@@ -138,7 +162,7 @@ class FavouriteItem extends ConsumerWidget {
                         ),
                         child: InkWell(
                           onTap: (){
-                            ref.read(favoritesProvider.notifier).addFavorite(properties![index].id!);
+                            //ref.read(favoritesProvider.notifier).addFavorite(properties![index].id!);
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
@@ -155,6 +179,7 @@ class FavouriteItem extends ConsumerWidget {
           );
         });
   }
+
   List<String> searchImage =[
     "assets/images/estate1.png",
     "assets/images/estate2.png",

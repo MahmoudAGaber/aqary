@@ -1,6 +1,7 @@
 
 
 import 'package:aqary/Models/CountryCitiesModel.dart';
+import 'package:aqary/Views/Home/Widgets/MoreEstates.dart';
 import 'package:aqary/Views/HomePage.dart';
 import 'package:aqary/data/StateModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -136,10 +137,9 @@ class SearchByLocation {
                                       child: Column(
                                         children: [
                                           InkWell(
-                                            onTap: (){
-                                              ref.read(userLocationProvider.notifier).getCurrentUserLocation();
-                                             // ref.read(nearByProvider.notifier).nearByEstate();
-                                              Navigator.pop(context);
+                                            onTap: ()async{
+                                              await ref.read(userLocationProvider.notifier).getCurrentUserLocation();
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>Homepage(page: 0)));
                                             },
                                             child: Row(
                                               children: [
@@ -167,28 +167,33 @@ class SearchByLocation {
                                           Divider(height: 5,),
                                           SizedBox(height: Dimensions
                                               .paddingSizeDefault,),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text("مؤخرا",style: Theme.of(context).textTheme.bodyLarge!.copyWith()),
-                                              SizedBox(height: 10,),
-                                              Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Icon(Icons.location_on_rounded,color: Theme.of(context).primaryColor, size: 18,),
-                                                  SizedBox(width: 10,),
-                                                  currentLocation != null ?
-                                                  Text(
-                                                    "${ref.watch(UserProvider).data!.recentLocations.first}",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall!
-                                                        .copyWith(fontSize: 15),
-                                                    overflow: TextOverflow.clip,
-                                                  ):SizedBox(),
-                                                ],
-                                              )
-                                            ],
+                                          InkWell(
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: "${ref.watch(UserProvider).data!.recentLocations.first}",)));
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("مؤخرا",style: Theme.of(context).textTheme.bodyLarge!.copyWith()),
+                                                SizedBox(height: 10,),
+                                                Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Icon(Icons.location_on_rounded,color: Theme.of(context).primaryColor, size: 18,),
+                                                    SizedBox(width: 10,),
+                                                    currentLocation != null ?
+                                                    Text(
+                                                      "${ref.watch(UserProvider).data!.recentLocations.first}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall!
+                                                          .copyWith(fontSize: 15),
+                                                      overflow: TextOverflow.clip,
+                                                    ):SizedBox(),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
                                           ),
                                           SizedBox(height: Dimensions.paddingSizeDefault,),
                                           Divider(height: 5,),

@@ -16,8 +16,7 @@ enum FavoritesFilter {recently ,desc, asc}
 
 final favoritesProvider = StateNotifierProvider<FavoritesNotifier, StateModel<List<RealStateModel>>>((ref) => FavoritesNotifier(ref));
 final favoritesSorted = StateProvider<String>((ref) => "recently");
-final favoriteProvider = StateProvider.family<bool, int>((ref, id) => false);
-final favorite2Provider = StateProvider.family<bool, int>((ref, id) => false);
+final searchClearProvider = StateProvider<bool>((ref) => false);
 
 final favoritesFilterProvider = StateProvider<FavoritesFilter>((ref) => FavoritesFilter.recently);
 
@@ -28,27 +27,7 @@ class FavoritesNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
   FavoritesNotifier(this.ref): super(StateModel.loading());
 
 
-  Future<void> addFavorite(String id)async {
-    RequestHandler requestHandler = RequestHandler();
-    Map<String, dynamic> message;
-
-    try {
-      message = await requestHandler.getData(
-        endPoint: '/properties/$id/favorite',
-        auth: true,
-        fromJson: (json) => Map(),
-      );
-
-      if(message['messages'] == "Updated!"){
-        print(message['message']);
-      }
-
-    } catch (e) {
-      print("ErrorToAddToFavorites$e");
-    }
-  }
-
-  Future<List<RealStateModel>> getFavorites(sortType, sortby)async {
+  Future<List<RealStateModel>> getFavorites({required String sortType, required String sortby, String? search})async {
     RequestHandler requestHandler = RequestHandler();
     List<RealStateModel> properties = [];
 
@@ -56,6 +35,7 @@ class FavoritesNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
       state = StateModel.loading();
 
       Map<String, dynamic> queryParams = {
+        'search': search,
         'sort_by' : sortby,
         'sort_type': sortType,
         'favorites': 'true',
@@ -72,7 +52,7 @@ class FavoritesNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
         fromJson: (json) => RealStateModel.listFromJson(json),
       );
 
-      if(properties.isEmpty){
+      if(properties.isEmpty || properties == []){
         state = StateModel.empty();
       }else{
         state = StateModel.success(properties);
@@ -84,5 +64,36 @@ class FavoritesNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
       state = StateModel.fail("Error in data");
     }
     return properties;
+  }
+
+  Future<void> removeFavorite(String id)async {
+    RequestHandler requestHandler = RequestHandler();
+    List<RealStateModel> realEstateTemp = [];
+
+    try {
+      requestHandler.getData(
+        endPoint: '/properties/$id/favorite',
+        auth: true,
+        fromJson: (json) => Map(),
+      );
+
+      realEstateTemp.clear();
+      realEstateTemp = state.data!;
+
+      for(var item in realEstateTemp){
+        if(item.id == id){
+          item.isFavorite = false;
+          realEstateTemp.remove(item);
+          print("WELLDONE");
+        }
+
+
+      }
+      state = StateModel.success(realEstateTemp);
+
+
+    } catch (e) {
+      print("ErrorToAddToFavorites$e");
+    }
   }
 }

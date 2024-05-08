@@ -4,7 +4,7 @@ class NotificationModel {
   final String type;
   final String title;
   final String body;
-  final bool isRead;
+  bool isRead;
   final String user;
   final String contract;
   final String createdAt;
