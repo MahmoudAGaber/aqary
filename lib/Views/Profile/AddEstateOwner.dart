@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../ViewModel/UserViewModel.dart';
-import '../../helper/ShimmerWidget.dart';
+import '../../helper/Shimmer/ShimmerWidget.dart';
 import '../../utill/dimensions.dart';
 import '../base/custom_app_bar.dart';
 import '../base/custom_button.dart';
@@ -312,7 +312,7 @@ class _AddEstateOwnerState extends ConsumerState<AddEstateOwner> {
                     onPressed: (){
                       Navigator.push(context,MaterialPageRoute(builder: (BuildContext? context) {
                         if (context != null) {
-                          return Home();
+                          return Homepage(page: 4);
                         } else {
                           // Handle the case where context is null
                           return Container(); // or any other fallback UI

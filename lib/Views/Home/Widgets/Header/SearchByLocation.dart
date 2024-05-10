@@ -41,8 +41,9 @@ class SearchByLocation {
       builder: (BuildContext context) {
         return Consumer(
             builder: (context, ref, child) {
-              var currentLocation = ref.watch(estatelocationProvider);
+              var currentLocation = ref.watch(userLocationProvider);
               var countries = ref.watch(CountryCityProvider);
+              var contriesByRegions = ref.watch(CountryByRegionsProvider);
 
               return WillPopScope(
                 onWillPop: () async {
@@ -169,9 +170,10 @@ class SearchByLocation {
                                               .paddingSizeDefault,),
                                           InkWell(
                                             onTap: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: "${ref.watch(UserProvider).data!.recentLocations.first}",)));
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: "${ref.watch(UserProvider).data!.recentLocations.first.split(" ")[0]}",)));
                                             },
-                                            child: Column(
+                                            child:ref.watch(UserProvider).data!.recentLocations.isNotEmpty || ref.watch(UserProvider).data!.recentLocations == []
+                                    ?Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text("مؤخرا",style: Theme.of(context).textTheme.bodyLarge!.copyWith()),
@@ -183,7 +185,7 @@ class SearchByLocation {
                                                     SizedBox(width: 10,),
                                                     currentLocation != null ?
                                                     Text(
-                                                      "${ref.watch(UserProvider).data!.recentLocations.first}",
+                                                      "${ref.watch(UserProvider).data!.recentLocations[0]}",
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodySmall!
@@ -191,12 +193,13 @@ class SearchByLocation {
                                                       overflow: TextOverflow.clip,
                                                     ):SizedBox(),
                                                   ],
-                                                )
+                                                ),
+                                                SizedBox(height: Dimensions.paddingSizeDefault,),
+                                                Divider(height: 5,),
                                               ],
-                                            ),
+                                            ):SizedBox(),
                                           ),
-                                          SizedBox(height: Dimensions.paddingSizeDefault,),
-                                          Divider(height: 5,),
+
                                           SizedBox(height: Dimensions
                                               .paddingSizeDefault,),
 
@@ -214,7 +217,7 @@ class SearchByLocation {
                                                     SizedBox(width: 10,),
                                                     currentLocation != null ?
                                                     Text(
-                                                      "جميع مدن  ${currentLocation.placemark!.administrativeArea}",
+                                                      "جميع مدن  ${currentLocation.placemark!.country}",
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodySmall!
@@ -223,24 +226,39 @@ class SearchByLocation {
                                                     ):SizedBox(),
                                                   ],
                                                 ),
-                                                ListView.builder(
-                                                    itemCount: 4,
-                                                    shrinkWrap: true,
-                                                    itemBuilder: (context,index){
-                                                      return Padding(
-                                                        padding: const EdgeInsets.all(8.0),
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Text("mountain View",style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16)),
-                                                            InkWell(
-                                                              onTap: (){},
-                                                              child: Icon(Icons.arrow_forward_ios,size: 15,),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      );
-                                                    })
+                                                contriesByRegions.handelState(
+                                                  onLoading:  (state)=> Padding(
+                                                    padding: const EdgeInsets.only(top: 20),
+                                                    child: Center(child: SizedBox(height: 25,width: 25,
+                                                        child: CircularProgressIndicator(color: Theme.of(context).primaryColor,)),),
+                                                  ),
+                                                  onSuccess: (state)=> ListView.builder(
+                                                      itemCount: contriesByRegions.data![0].citiesAndAreas.length,
+                                                      shrinkWrap: true,
+                                                      itemBuilder: (context,index){
+                                                        print("${contriesByRegions.data!.length}");
+                                                        return Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text(contriesByRegions.data![0].citiesAndAreas[index],style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16)),
+                                                              InkWell(
+                                                                onTap: (){
+                                                                  ref.read(RealStateProvider.notifier).state.clear();
+                                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: contriesByRegions.data![0].citiesAndAreas[index],)));
+
+                                                                },
+                                                                child: Icon(Icons.arrow_forward_ios,size: 15,),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },),
+                                                  onFailure: (state)=> Text("SHIT")
+
+                                                )
+
                                               ],
                                             ),
 
@@ -262,30 +280,43 @@ class SearchByLocation {
                                            ),
                                            child: Column(
                                              children: [
-                                               Container(
-                                                 color: Colors.grey[100],
-                                                 child: Padding(
-                                                   padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
-                                                   child: Row(
-                                                     children: [
-                                                       Text(item.countryName,style: Theme.of(context).textTheme.titleLarge,),
-                                                     ],
+                                               InkWell(
+                                                 onTap:(){
+                                                   ref.read(RealStateProvider.notifier).state.clear();
+                                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: item.countryName,)));
+                                                   },
+                                                 child: Container(
+                                                   color: Colors.grey[100],
+                                                   child: Padding(
+                                                     padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
+                                                     child: Row(
+                                                       children: [
+                                                         Text(item.countryName,style: Theme.of(context).textTheme.titleLarge,),
+                                                       ],
+                                                     ),
                                                    ),
                                                  ),
                                                ),
                                                Column(
                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: List.generate(item.citiesAndAreas.length, (index){
-                                                    return Container(
-                                                      child: Row(
-                                                        children: [
-                                                          item.citiesAndAreas[index] == "" ||  item.citiesAndAreas[index] == null
-                                                              ?SizedBox()
-                                                              :Padding(
-                                                            padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 12),
-                                                            child: Text(item.citiesAndAreas[index],style: Theme.of(context).textTheme.bodyMedium,),
-                                                          ),
-                                                        ],
+                                                    return InkWell(
+                                                      onTap: (){
+                                                        ref.read(RealStateProvider.notifier).state.clear();
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: item.citiesAndAreas[index],)));
+
+                                                      },
+                                                      child: Container(
+                                                        child: Row(
+                                                          children: [
+                                                            item.citiesAndAreas[index] == "" ||  item.citiesAndAreas[index] == null
+                                                                ?SizedBox()
+                                                                :Padding(
+                                                              padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 12),
+                                                              child: Text(item.citiesAndAreas[index],style: Theme.of(context).textTheme.bodyMedium,),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     );
                                                   })

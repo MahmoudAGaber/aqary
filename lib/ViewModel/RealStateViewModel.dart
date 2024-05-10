@@ -45,6 +45,7 @@ final RealStateEditProvider = StateNotifierProvider<RealStateEditNotifier,List<d
 
 final CountryCityProvider = StateNotifierProvider<CountryCityNotifier,StateModel<List<Countries>>>((ref) => CountryCityNotifier(ref));
 
+final CountryByRegionsProvider = StateNotifierProvider<CountryByRegionsNotifier,StateModel<List<Countries>>>((ref) => CountryByRegionsNotifier(ref));
 
 
 class RealStateNotifier extends StateNotifier<List<RealStateModel>>{
@@ -56,15 +57,17 @@ class RealStateNotifier extends StateNotifier<List<RealStateModel>>{
     requestHandler.postAnotherData(
       endPoint: "/properties",
         auth: true,
+        method: 'POST',
         requestBody: requestBody,
         model: data
     );
   }
 
-  void editRealState(RealStateModel? data,Map<String,String>requestBody){
+  void editRealState(RealStateModel? data,Map<String,String>requestBody,String id){
     RequestHandler requestHandler = RequestHandler();
     requestHandler.postAnotherData(
-        endPoint: "/properties",
+        endPoint: "/properties/$id",
+        method: 'PATCH',
         auth: true,
         requestBody: requestBody,
         model: data
@@ -90,7 +93,6 @@ class RealStateNotifier extends StateNotifier<List<RealStateModel>>{
     List<RealStateModel> oldProperties= [];
     double? lat =  ref.watch(userLocationProvider)!.latitude;
     double? long =  (ref.watch(userLocationProvider)!.longtude)!;
-
 
       Map<String, dynamic> queryParams = {
         'type': type,
@@ -290,5 +292,48 @@ class CountryCityNotifier extends StateNotifier<StateModel<List<Countries>>>{
     }
   }
 }
+
+class CountryByRegionsNotifier extends StateNotifier<StateModel<List<Countries>>>{
+  Ref ref;
+  CountryByRegionsNotifier(this.ref):super(StateModel.loading());
+
+  Future<void> getCountries(String searchKey) async{
+    RequestHandler requestHandler = RequestHandler();
+    Map<String, List<String>> data;
+    List<Countries> countries = [];
+    try {
+      state = StateModel.loading();
+
+      countries.clear();
+
+      data = await requestHandler.getData(
+        endPoint: "/countries?search=$searchKey",
+        auth: true,
+        fromJson: (json) {
+          Map<String, dynamic> temp = Map<String, dynamic>.from(json);
+          return temp.map((key, value) => MapEntry(key, List<String>.from(value)));
+        },);
+
+      data.forEach((country, cities) {
+        if(country != 'undefined'){
+          countries.add(Countries(countryName: country, citiesAndAreas: cities));
+        }
+      });
+
+      if(countries.isNotEmpty){
+        state = StateModel.success(countries);
+
+      }else{
+        state = StateModel.loading();
+      }
+
+      countries.forEach((element) {print(element.countryName);});
+
+    }catch(e){
+      state = StateModel.fail("Faild to get data $e");
+    }
+  }
+}
+
 
 

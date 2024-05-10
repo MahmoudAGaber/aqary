@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../ViewModel/CategoryViewModel.dart';
-import '../../../helper/ShimmerWidget.dart';
+import '../../../helper/Shimmer/ShimmerWidget.dart';
 import '../../../utill/dimensions.dart';
 import 'Estate_card.dart';
 

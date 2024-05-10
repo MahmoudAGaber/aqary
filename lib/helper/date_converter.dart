@@ -105,4 +105,9 @@ class DateConverter {
    return NumberFormat('#,##0', 'en_US').format(number);
   }
 
+  static dynamic parseFormattedNumber(String formattedString) {
+    String unformatted = formattedString.replaceAll(RegExp(r'[^\d.-]'), '');
+    return num.tryParse(unformatted);
+  }
+
 }

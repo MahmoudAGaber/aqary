@@ -1,6 +1,7 @@
 
 
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:aqary/Models/ContractModel.dart';
 import 'package:aqary/Models/RealStateModel.dart';
@@ -15,6 +16,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart';
+import 'package:http/http.dart';
+import 'package:http/http.dart';
 
 import '../../../ViewModel/ContractViewModel.dart';
 import '../../../helper/date_converter.dart';
@@ -23,6 +27,7 @@ import '../../base/custom_app_bar.dart';
 import 'EstateDetails.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
+import 'package:http/http.dart' as http;
 
 class OwnerCTSignature extends ConsumerStatefulWidget {
   String contractId;
@@ -718,22 +723,26 @@ class _RentState extends ConsumerState<OwnerCTSignature> {
                                   onTap: () async{
                                     if(ref.watch(signatureProvider).data != null){
                                       var rentPeriod = "${calculateMonthsBetween(fromDateEditingController.text, toDateEditingController.text)}  شهر";
-                                      File file =  await PdfInvoiceApi.generate(
-                                          signature: ref,
-                                          todayDate: todayDate!,
-                                          from: fromDateEditingController.text,
-                                          to: toDateEditingController.text,
-                                          rentPeriod: rentPeriod,
-                                          location: property.data!.data.location,
-                                          ownerName: ownerEstateEditingController.text,
-                                          renterName: renterEstateEditingController.text,
-                                          titleRent: "${property.data!.data.title}",
-                                          payment: paymentSystemEditingController.text,
-                                          notes: noteEditingController.text,
-                                          isOwner: true,
-                                          paymentStyle: PaymentHelper.getArabicPaymentStyle(paymentSystem));
+                                     await fetchImageAsBytes(contract.data!.first.renter_signature).then((value)async{
+                                        File file =  await PdfInvoiceApi.generate(
+                                            signature: ref,
+                                            todayDate: todayDate!,
+                                            from: fromDateEditingController.text,
+                                            to: toDateEditingController.text,
+                                            rentPeriod: rentPeriod,
+                                            location: property.data!.data.location,
+                                            ownerName: ownerEstateEditingController.text,
+                                            renterName: renterEstateEditingController.text,
+                                            titleRent: "${property.data!.data.title}",
+                                            payment: paymentSystemEditingController.text,
+                                            notes: noteEditingController.text,
+                                            isOwner: true,
+                                            renterSignature: value!,
+                                            paymentStyle: PaymentHelper.getArabicPaymentStyle(paymentSystem));
+                                        print("TestContractFIle${file.path}");
+                                      });
 
-                                      print("TestContractFIle${file.path}");
+
 
                                       Navigator.push(
                                           context,
@@ -825,26 +834,28 @@ class _RentState extends ConsumerState<OwnerCTSignature> {
                               if(signature.data! != null) {
                                 if (_formKey.currentState!.validate()) {
                                   var rentPeriod = "${calculateMonthsBetween(fromDateEditingController.text, toDateEditingController.text)}  شهر";
-                                  File file =  await PdfInvoiceApi.generate(
-                                      signature: ref,
-                                      todayDate: todayDate!,
-                                      from: fromDateEditingController.text,
-                                      to: toDateEditingController.text,
-                                      rentPeriod: rentPeriod,
-                                      location: property.data!.data.location,
-                                      ownerName: ownerEstateEditingController.text,
-                                      renterName: renterEstateEditingController.text,
-                                      titleRent: "${property.data!.data.title}",
-                                      payment: paymentSystemEditingController.text,
-                                      notes: noteEditingController.text,
-                                      isOwner: true,
-                                      paymentStyle: PaymentHelper.getArabicPaymentStyle(paymentSystem)).then((value){
-                                    ref.read(ContractMineProvider.notifier).acceptContract(widget.contractId,value.path);
-                                    return value;
-                                  });
-
-                                  Navigator.pop(context);
+                                 await fetchImageAsBytes(contract.data!.first.renter_signature).then((renterSignature)async{
+                                   File file =  await PdfInvoiceApi.generate(
+                                       signature: ref,
+                                       todayDate: todayDate!,
+                                       from: fromDateEditingController.text,
+                                       to: toDateEditingController.text,
+                                       rentPeriod: rentPeriod,
+                                       location: property.data!.data.location,
+                                       ownerName: ownerEstateEditingController.text,
+                                       renterName: renterEstateEditingController.text,
+                                       titleRent: "${property.data!.data.title}",
+                                       payment: paymentSystemEditingController.text,
+                                       notes: noteEditingController.text,
+                                       isOwner: true,
+                                       renterSignature: renterSignature!,
+                                       paymentStyle: PaymentHelper.getArabicPaymentStyle(paymentSystem)).then((file){
+                                     ref.read(ContractMineProvider.notifier).acceptContract(widget.contractId,file.path);
+                                     return file;
+                                   });
+                                 });
                                 }
+                                Navigator.pop(context);
                               }else{
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("من فضلك قم بإضة التوقيع الخاص بك",style: TextStyle(color: Colors.black),)));
                               }
@@ -904,5 +915,20 @@ class _RentState extends ConsumerState<OwnerCTSignature> {
         );
       },
     );
+  }
+  Future<Uint8List?> fetchImageAsBytes(String imageUrl) async {
+    try {
+      http.Response response = await http.get(Uri.parse(imageUrl));
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        print('Failed to load image. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching image: $e');
+      return null;
+    }
   }
 }

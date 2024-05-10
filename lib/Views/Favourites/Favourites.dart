@@ -11,7 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../Models/CategoryModel.dart';
-import '../../helper/ShimmerWidget.dart';
+import '../../helper/Shimmer/ShimmerWidget.dart';
 import '../../utill/dimensions.dart';
 import '../Home/Widgets/Search/filterBS.dart';
 import '../Home/Widgets/Search/searchItem.dart';

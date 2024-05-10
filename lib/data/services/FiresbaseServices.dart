@@ -177,6 +177,7 @@ class FirebaseServices {
 
       List<String>? chatRoomIds = userDoc.data()?['chats']?.cast<String>();
 
+
       if (chatRoomIds != null && chatRoomIds.isNotEmpty) {
         List<Future<QuerySnapshot<Map<String, dynamic>>>> futures = chatRoomIds.map((roomId) =>
             chatRooms.doc(roomId).collection('messages').orderBy("messageDate",descending: true).get()).toList();

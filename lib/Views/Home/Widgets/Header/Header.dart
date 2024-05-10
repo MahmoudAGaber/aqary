@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../ViewModel/LocationViewModel.dart';
 import '../../../../ViewModel/NotificationViewModel.dart';
+import '../../../../ViewModel/RealStateViewModel.dart';
 import '../EstateOwner.dart';
 import '../Notification.dart';
 import '../Search/Search.dart';
@@ -69,6 +70,7 @@ class _HeaderState extends ConsumerState<Header> {
                       InkWell(
                         onTap: (){
                           //Navigator.push(context, MaterialPageRoute(builder: (context)=> MapView()));
+                          ref.read(CountryByRegionsProvider.notifier).getCountries(currentLocation!.placemark!.country!);
                           SearchByLocation().searchByLocation(context);
                         },
                         child: Icon(
@@ -147,7 +149,8 @@ class _HeaderState extends ConsumerState<Header> {
                               ),
                             ),
                           ),
-                          Align(
+                          notificationcount >0
+                              ? Align(
                             alignment: Alignment.topRight,
                             child: Container(
                               height: notificationcount! < 99 ? 18 :25,width: notificationcount! < 99 ? 18 :25,
@@ -164,7 +167,7 @@ class _HeaderState extends ConsumerState<Header> {
                                 ),
                               )
                             ),
-                          )
+                          ):SizedBox()
 
                         ],
                       ),

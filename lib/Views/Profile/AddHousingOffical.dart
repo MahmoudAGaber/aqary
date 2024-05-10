@@ -9,8 +9,9 @@ import 'package:flutter_svg/svg.dart';
 import '../../Models/RealStateModel.dart';
 import '../../Models/UserModel.dart';
 import '../../ViewModel/UserViewModel.dart';
-import '../../helper/ShimmerWidget.dart';
+import '../../helper/Shimmer/ShimmerWidget.dart';
 import '../../utill/dimensions.dart';
+import '../HomePage.dart';
 import '../base/custom_button.dart';
 import '../base/custom_dialog.dart';
 
@@ -309,7 +310,7 @@ class _AddHousingOfficalState extends ConsumerState<AddHousingOffical> {
                     onPressed: (){
                       Navigator.push(context,MaterialPageRoute(builder: (BuildContext? context) {
                         if (context != null) {
-                          return Settings();
+                          return Homepage(page: 4);
                         } else {
                           // Handle the case where context is null
                           return Container(); // or any other fallback UI

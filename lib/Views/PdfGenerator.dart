@@ -22,7 +22,8 @@ class PdfInvoiceApi {
     required String ownerName,
     required String renterName,
     required String notes,
-    required bool isOwner
+    required bool isOwner,
+    required Uint8List renterSignature
   }) async {
     final pdf = pw.Document();
 
@@ -83,7 +84,7 @@ class PdfInvoiceApi {
                     ),
                   ]
                 ),
-                pw.Row(
+                pw.Column(
                   children:
                     [
                       Row(
@@ -338,7 +339,10 @@ class PdfInvoiceApi {
                                                     ? pw.Image(pw.MemoryImage(signature.watch(signatureProvider).data!),width: 200,)
                                                     :SizedBox(),
                                               )
-                                          ):SizedBox()
+                                          ): pw.Center(child:  pw.Padding(
+                                              padding: EdgeInsets.all(8),
+                                              child: pw.Image(pw.MemoryImage(renterSignature),width: 200,fit: BoxFit.contain)
+                                          ))
                                       )
                                     ]
                                 ),

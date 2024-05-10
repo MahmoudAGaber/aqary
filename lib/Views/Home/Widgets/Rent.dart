@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:aqary/Models/ContractModel.dart';
 import 'package:aqary/Models/RealStateModel.dart';
@@ -12,11 +13,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../ViewModel/ContractViewModel.dart';
 import '../../../helper/date_converter.dart';
 import '../../PdfGenerator.dart';
 import '../../base/custom_app_bar.dart';
+import '../../base/custom_dialog.dart';
 import 'EstateDetails.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
@@ -92,6 +95,8 @@ class _RentState extends ConsumerState<Rent> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      fromDateEditingController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
+      toDateEditingController.text = DateFormat('dd/MM/yyyy').format(DateTime.now().add(Duration(days: 364)));
       todayDate = DateConverter.slotDate(DateTime.now());
       ownerEstateEditingController.text = widget.property.createdBy['name'];
     });
@@ -105,7 +110,7 @@ class _RentState extends ConsumerState<Rent> {
     var signature = ref.watch(signatureProvider);
     print(signature);
     paymentSystemEditingController.text =
-    "الدفعة ${PaymentHelper.getPayment(DateConverter.numberFormat(widget.property.yearPrice), paymentSystem)}";
+    "الدفعة ${PaymentHelper.getPayment(widget.property.yearPrice, paymentSystem)}";
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -703,7 +708,8 @@ class _RentState extends ConsumerState<Rent> {
                                 payment: paymentSystemEditingController.text,
                                 notes: noteEditingController.text,
                                 isOwner: false,
-                                paymentStyle:
+                               renterSignature: Uint8List(0),
+                               paymentStyle:
                                     PaymentHelper.getArabicPaymentStyle(
                                         paymentSystem));
 
@@ -807,9 +813,10 @@ class _RentState extends ConsumerState<Rent> {
                             payment: paymentSystemEditingController.text,
                             notes: noteEditingController.text,
                             isOwner: false,
-
-                            paymentStyle: PaymentHelper.getArabicPaymentStyle(paymentSystem)).then((value){
-                          ref.read(ContractProvider.notifier).sentContract(
+                            renterSignature: Uint8List(0),
+                            paymentStyle: PaymentHelper.getArabicPaymentStyle(paymentSystem)).then((value)async{
+                            File signatureFile = await writeToTempFile(ref.watch(signatureProvider).data!,'renterSignature');
+                            ref.read(ContractProvider.notifier).sentContract(
                               ContractModel(
                                   value,
                                   fromDateEditingController.text,
@@ -817,12 +824,16 @@ class _RentState extends ConsumerState<Rent> {
                                   rentPeriod,
                                   paymentSystemEditingController.text.split(" ")[1],
                                   paymentType.name,
-                                  noteEditingController.text),
+                                  noteEditingController.text,
+                                  signatureFile
+                              ),
                               widget.property.id);
                           return value;
                         });
 
-                        Navigator.pop(context);
+                        showAnimatedDialog(
+                            context, dismissible: false, sentToOwner()
+                        );
                       }
                     }else{
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("من فضلك قم بإضة التوقيع الخاص بك",style: TextStyle(color: Colors.black),)));
@@ -873,6 +884,63 @@ class _RentState extends ConsumerState<Rent> {
           ),
         );
       },
+    );
+  }
+
+  Future<File> writeToTempFile(Uint8List data, String filename) async {
+    Directory tempDir = await getTemporaryDirectory();
+    String filePath = '${tempDir.path}/$filename.jpg';
+
+    File file = File(filePath);
+
+    await file.writeAsBytes(data);
+
+    return file;
+  }
+
+  Widget sentToOwner(){
+    return Dialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      insetPadding: EdgeInsets.zero,
+      child: Builder(
+        builder: (BuildContext dialogContext){
+          return  Container(
+            height: MediaQuery.of(dialogContext).size.height*.38,
+            width: MediaQuery.of(dialogContext).size.width*.9,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 185,
+                  width: 185,
+                  child: Stack(
+                    children: [
+                      SvgPicture.asset("assets/images/Ellipse2.svg",colorFilter: ColorFilter.linearToSrgbGamma(),),
+                      Center(child: SvgPicture.asset("assets/images/Ellipse2.svg",height: 150,width: 150,)),
+                      Center(child: Container(width: 80,height:80,decoration: BoxDecoration(color: Theme.of(dialogContext).primaryColor,borderRadius: BorderRadius.circular(50)),)),
+                      Center(child: Text("✓",style: Theme.of(dialogContext).textTheme.titleLarge!.copyWith(fontSize: 22,color: Colors.white),)),
+
+                    ],
+                  ),),
+                Text('تم ارسال تنبيه للمؤجر',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(dialogContext).textTheme.titleLarge!.copyWith(fontSize: 20),),
+                SizedBox(height: Dimensions.paddingSizeLarge,),
+                CustomButton(
+                    buttonText: "تم",
+                    height: 50,
+                    width: 200,
+                    textColor: Colors.white,
+                    borderRadius: 12,
+                    onPressed: (){
+                      Navigator.pop(context);
+
+                    }
+                ),
+              ],
+            ),);
+        },
+      ),
     );
   }
 }

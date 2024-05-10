@@ -9,7 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../helper/ShimmerWidget.dart';
+import '../../../ViewModel/RealStateViewModel.dart';
+import '../../../helper/Shimmer/ShimmerWidget.dart';
 import '../../../utill/dimensions.dart';
 import 'EstateDetails.dart';
 import 'MoreEstates.dart';
@@ -46,6 +47,8 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                 Text("بالقرب منك", style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18)),
                 InkWell(
                   onTap: (){
+                    ref.read(RealStateProvider.notifier).state.clear();
+
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates()));
                   },
                     child: Text("المزيد",

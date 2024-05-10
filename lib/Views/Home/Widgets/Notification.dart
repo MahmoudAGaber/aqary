@@ -59,6 +59,7 @@ class _NotificationsState extends ConsumerState<Notifications> {
                   ListView.builder(
                     itemCount: notification.data!.length,
                       scrollDirection: Axis.vertical,
+                      reverse: true,
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemBuilder: (context, index){
@@ -221,7 +222,7 @@ class _NotificationsState extends ConsumerState<Notifications> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(notificationItem.title,
+                      Text(notificationItem.title.ar,
                           style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14)),
                       Text(DateConverter.timeAgoSinceDate(DateTime.parse(notificationItem.createdAt),),
                           style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey),textAlign: TextAlign.left,),
@@ -230,10 +231,13 @@ class _NotificationsState extends ConsumerState<Notifications> {
                   InkWell(
                     onTap: ()async{
 
-                      if(notificationItem.title.contains("request")){
+                      if(notificationItem.title.en.contains("request")){
                         Navigator.push(context, MaterialPageRoute(builder: (context)=> OwnerCTSignature(contractId: notificationItem.contract,)));
-                      }else if(notificationItem.title.contains("accepted")){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PaymentEstate(contractId: notificationItem.contract,)));
+                      }else if(notificationItem.title.en.contains("accepted")){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PaymentEstate(contractId: notificationItem.contract,type: 'prepaid')));
+                      }
+                      else if(notificationItem.title.en.contains("Contract Active")){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PaymentEstate(contractId: notificationItem.contract,type: 'paid')));
 
                       }
                       await ref.read(NotificationProvider.notifier).readOneNotifications(notificationItem.id);
@@ -243,9 +247,9 @@ class _NotificationsState extends ConsumerState<Notifications> {
                     child: RichText(
                         text: TextSpan(
                             children: [
-                              TextSpan(text: notificationItem.body,style:Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey) ),
-                              TextSpan(text: notificationItem.title.contains("request") ?" اذهب الي صفحه التوقيع " :" اذهب الي صفحه الدفع ",style:Theme.of(context).textTheme.bodySmall!.copyWith(color: Theme.of(context).primaryColor),),
-                              TextSpan(text: notificationItem.title.contains("request") ?"لإتمام تأجير العقار" :"الآن ",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey))
+                              TextSpan(text: notificationItem.body.ar,style:Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey) ),
+                              TextSpan(text: notificationItem.title.en.contains("request") ?" اذهب الي صفحه التوقيع " : notificationItem.title.en.contains("accepted") ?" اذهب الي صفحه الدفع " : " اضغط لمعرفه التفاصيل ",style:Theme.of(context).textTheme.bodySmall!.copyWith(color: Theme.of(context).primaryColor),),
+                              TextSpan(text: notificationItem.title.en.contains("request") ?"لإتمام تأجير العقار" : notificationItem.title.en.contains("accepted") ?"الآن " : "",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey))
                     ])),
                   ),
                   Text("  ",

@@ -38,6 +38,8 @@ class RealStateModel {
   final dynamic createdBy;
   final List<dynamic>? managers;
   final dynamic? distance;
+  String? deleted_images;
+  String? deleted_videos;
 
 
   RealStateModel({
@@ -65,7 +67,9 @@ class RealStateModel {
     required this.isFavorite,
     this.createdBy,
     this.managers,
-    this.distance
+    this.distance,
+    this.deleted_images,
+    this.deleted_videos
   });
 
   factory RealStateModel.fromJson(Map<String, dynamic> json) {
@@ -108,7 +112,7 @@ class RealStateModel {
       'bedrooms_count': bedroomsCount.toString(),
       'country': country,
       'city': city,
-      'price': yearPrice,
+      'price': yearPrice.toString(),
       'type': type,
       'location': location,
       'long': long.toString(),
@@ -118,6 +122,8 @@ class RealStateModel {
       //'videos': videos.map((video) => video.path).toList(),
       //'promotion': promotion.toString(),
       'is_available': isAvailable.toString(),
+      'deleted_images': deleted_images.toString(),
+      'deleted_videos': deleted_videos.toString(),
      // 'id': id,
      // 'createdAt': createdAt,
       //'updatedAt': updatedAt,

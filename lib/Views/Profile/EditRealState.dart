@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:aqary/ViewModel/RealStateViewModel.dart';
+import 'package:aqary/Views/HomePage.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
 import 'package:aqary/Views/base/custom_button.dart';
 import 'package:aqary/helper/date_converter.dart';
@@ -42,35 +43,40 @@ class _EditEstateState extends ConsumerState<EditEstate> {
   TextEditingController estatePriceController = TextEditingController();
   String? bedroom_count = "";
   String? bathroom_count = "";
+  List<String> deletedImage = [];
+  List<File> newFiles = [];
 
   CameraPosition? kGooglePlex;
 
   PaymentsSystem paymentDuration(String text){
-    if(text == 'half_annual'){
+    if(text == 'نصف سنوي'){
       return PaymentsSystem.Semi_annually;
     }
-    else if(text == 'Quarterly'){
+    else if(text == 'ربع سنوي'){
       return PaymentsSystem.Quarterly;
     }
-    else if(text == 'monthly'){
+    else if(text == 'شهري'){
       return PaymentsSystem.monthly;
     }
     return PaymentsSystem.annually;
   }
 
-@override
+
+
+  @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      print("BIGNOW${widget.realStateModel.bedroomsCount}");
+      ref.read(RealStateEditProvider.notifier).state.clear();
       estateNameController.text = widget.realStateModel.title;
       estateAddressController.text = widget.realStateModel.location;
       estateDescriptionController.text = widget.realStateModel.description;
       estatePriceController.text = DateConverter.numberFormat(widget.realStateModel.yearPrice).toString();
       ref.read(bedRoomNumbersProvider.notifier).state = widget.realStateModel.bedroomsCount;
       ref.read(bathroomNumbersProvider.notifier).state = widget.realStateModel.bathroomsCount;
-      ref.read(estateTypeProvider.notifier).state = widget.realStateModel.type == 'appartment' ? EstateType.department: EstateType.villa;
+      ref.read(estateTypeProvider.notifier).state = widget.realStateModel.type == 'department' ? EstateType.department: EstateType.villa;
       ref.read(paymentsSystemProvider.notifier).state = paymentDuration(widget.realStateModel.paymentDuration!);
       ref.read(RealStateEditProvider.notifier).getEstateFiles(widget.realStateModel.images);
+      ref.read(StateIsAvalibleProvider.notifier).state = widget.realStateModel.isAvailable? EstateIsAvalible.Avalible : EstateIsAvalible.notAvalible;
       kGooglePlex = CameraPosition(
         target: LatLng(widget.realStateModel.lat, widget.realStateModel.long),
         zoom: 14.3,
@@ -86,6 +92,7 @@ class _EditEstateState extends ConsumerState<EditEstate> {
     var paymentSystem = ref.watch(paymentsSystemProvider);
     var estateLocation = ref.watch(estatelocationProvider);
     var estateFiles  = ref.watch(RealStateEditProvider);
+    var stateIsAvalible = ref.watch(StateIsAvalibleProvider);
 
     if(estateLocation!.placemark != null){
       var estateAddress = "${estateLocation.placemark!.country}, ${estateLocation.placemark!.locality}, ${estateLocation.placemark!.administrativeArea}, ${estateLocation.placemark!.street}";
@@ -95,7 +102,7 @@ class _EditEstateState extends ConsumerState<EditEstate> {
     return PopScope(
       onPopInvoked: (value)async{
         if(value){
-          ref.read(RealStateEditProvider.notifier).state = [];
+          ref.read(RealStateEditProvider.notifier).state.clear();
         }
       },
       child: Scaffold(
@@ -104,7 +111,7 @@ class _EditEstateState extends ConsumerState<EditEstate> {
             isCenter: true,
             onBackPressed: (){
               Navigator.pop(context);
-              ref.read(RealStateEditProvider.notifier).state = [];
+              ref.read(RealStateEditProvider.notifier).state.clear();
             },
             isBackButtonExist: true,
           ),
@@ -260,6 +267,7 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                         value: EstateType.department,
                                         groupValue: estateType,
                                         onChanged: (EstateType? value) {
+                                          print(value);
                                           if (value != null) {
                                             ref.read(estateTypeProvider.notifier).state = value;
                                           }
@@ -274,9 +282,11 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                         value: EstateType.villa,
                                         groupValue: estateType,
                                         onChanged: (EstateType? value) {
+                                          print(value);
                                           if (value != null) {
                                             ref.read(estateTypeProvider.notifier).state = value;
                                           }
+                                          //print(estateType);
 
                                         },
                                       ),
@@ -520,6 +530,7 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                                   child: InkWell(
                                                       onTap: (){
                                                         ref.read(RealStateEditProvider.notifier).removeEstate(estateIndex);
+                                                        deletedImage.add(estateFiles[estateIndex].path);
                                                       },
                                                       child: Icon(Icons.close, size: 16, color: Colors.white)),
                                                 ),
@@ -592,7 +603,40 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                 children: List.generate(paymentsSystemTxt.length, (index) => paymentWidget(index,paymentSystem))
                             ),
 
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: CustomButton(
+                                        buttonText: "مؤجر",
+                                        textColor: Colors.white,
+                                        height: 48,
+                                        borderRadius: 12,
+                                        backgroundColor: stateIsAvalible != EstateIsAvalible.notAvalible ? Colors.grey: Theme.of(context).primaryColor,
+                                        onPressed: (){
+                                          ref.read(StateIsAvalibleProvider.notifier).state = EstateIsAvalible.notAvalible;
+                                        }
+                                    ),
+                                  ),
+                                  SizedBox(width: Dimensions.paddingSizeDefault,),
+                                  Expanded(
+                                    child: CustomButton(
+                                        buttonText: "غير مؤجر",
+                                        textColor: Colors.white,
+                                        backgroundColor: stateIsAvalible != EstateIsAvalible.Avalible ? Colors.grey: Theme.of(context).primaryColor,
+                                        height: 48,
+                                        borderRadius: 12,
+                                        onPressed: (){
+                                          ref.read(StateIsAvalibleProvider.notifier).state = EstateIsAvalible.Avalible;
+                                        }
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             SizedBox(height: Dimensions.paddingSizeDefault,),
+
                             CustomButton(
                                 buttonText: "تعديل",
                                 textColor: Colors.white,
@@ -600,16 +644,17 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                 borderRadius: 12,
                                 onPressed: (){
                                   if(_formKey.currentState!.validate()){
-                                    if(estateFiles.isNotEmpty){
                                       if(estateLocation.latitude !=null || estateLocation.longtude != null || estateLocation.placemark !=null){
+                                        newFiles = estateFiles.where((element) => !element.path.toString().contains("amazonaws")).toList().cast<File>();
+                                        List<String> deletedImg = deletedImage.where((element) => element.contains("amazonaws")).toList().cast<String>();
                                         var realStateModel = RealStateModel(
                                             title: estateNameController.text,
-                                            images: estateFiles.cast<File>(),
+                                            images: newFiles,
                                             bathroomsCount: bathroomNumbers,
                                             bedroomsCount: bedroomNumbers,
                                             country: estateLocation.placemark!.country!,
                                             city:  estateLocation.placemark!.locality!,
-                                            yearPrice: estatePriceController.text,
+                                            yearPrice: DateConverter.parseFormattedNumber(estatePriceController.text),
                                             type: estateType.name,
                                             location: estateAddressController.text,
                                             long: estateLocation.longtude!,
@@ -619,21 +664,21 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                                             videos: [],
                                             isAvailable: true,
                                             isFavorite: false,
-                                          promotion: widget.realStateModel.promotion
+                                          promotion: widget.realStateModel.promotion,
+                                          deleted_images: deletedImg.toString()
                                         );
 
-                                        ref.read(RealStateProvider.notifier).editRealState(realStateModel,realStateModel.toJson());
+                                       ref.read(RealStateProvider.notifier).editRealState(realStateModel,realStateModel.toJson(),widget.realStateModel.id!);
 
                                         showAnimatedDialog(
                                             context, dismissible: false, estateEdited()
                                         );
                                       }
 
-                                    }
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("قم بادخال مرفقات العقار",style: TextStyle(color: Colors.black),) ));
+                                   // }
+                                   // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("قم بادخال مرفقات العقار",style: TextStyle(color: Colors.black),) ));
 
                                   }
-                                  print(estateFiles);
                                 }
                             ),
                             SizedBox(height: Dimensions.paddingSizeDefault,),
@@ -683,7 +728,8 @@ class _EditEstateState extends ConsumerState<EditEstate> {
                     textColor: Colors.white,
                     borderRadius: 12,
                     onPressed: (){
-                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> Homepage(page: 4)));
+
                     }
                 ),
               ],

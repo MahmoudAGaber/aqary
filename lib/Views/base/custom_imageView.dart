@@ -24,7 +24,9 @@ class _CustomImageViewState extends State<CustomImageView> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              Image.network(widget.imagesUrl[index].path,fit: BoxFit.cover,)]);
+              SizedBox(
+                width: MediaQuery.of(context).size.width*.85,
+                  child: Image.network(widget.imagesUrl[index].path,fit: BoxFit.cover,))]);
           },
 
 

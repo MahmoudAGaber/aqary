@@ -10,19 +10,21 @@ class ContractModel {
   String monthlyPrice;
   String paymentType;
   String note;
+  File renter_signature;
 
   ContractModel(this.file, this.from, this.to, this.paymentDuration,
-      this.monthlyPrice, this.paymentType, this.note);
+      this.monthlyPrice, this.paymentType, this.note,this.renter_signature);
 
   factory ContractModel.fromJson(Map<String, dynamic> json) {
     return ContractModel(
-      File(json['file']), // Create a File from the path
+      File(json['file']),
       json['from'] as String,
       json['to'] as String,
       json['payment_duration'] as String,
       json['monthly_price'] as String,
       json['payment_type'] as String,
       json['note'] as String,
+      File(json['renter_signature']),
     );
   }
 
@@ -60,6 +62,7 @@ class ContractMine {
   double monthlyPrice;
   String paymentType;
   String note;
+  String renter_signature;
   String contract;
   String status;
   List<dynamic> payments;
@@ -80,6 +83,7 @@ class ContractMine {
     required this.paymentType,
     required this.note,
     required this.contract,
+    required this.renter_signature,
     required this.status,
     required this.payments,
     required this.createdAt,
@@ -101,6 +105,7 @@ class ContractMine {
       paymentType: json['payment_type'],
       note: json['note'],
       contract: json['contract'],
+      renter_signature: json['renter_signature'],
       status: json['status'],
       payments: json['payments'],
       createdAt: json['createdAt'],

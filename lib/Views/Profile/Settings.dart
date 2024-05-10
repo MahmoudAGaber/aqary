@@ -1,24 +1,41 @@
-import 'package:aqary/Views/Aqary.dart';
+import 'package:aqary/Views/HomePage.dart';
 import 'package:aqary/Views/Login.dart';
 import 'package:aqary/Views/Profile/AddEstateOwner.dart';
 import 'package:aqary/Views/Profile/AddHousingOffical.dart';
 import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../ViewModel/NotificationViewModel.dart';
+import '../../ViewModel/UserViewModel.dart';
 import '../../helper/Authentication.dart';
 import '../base/custom_app_bar.dart';
 
-class Settings extends StatefulWidget {
-  const Settings({super.key});
+class Settings extends ConsumerStatefulWidget {
+
+   Settings({super.key});
 
   @override
-  State<Settings> createState() => _SettingsState();
+  ConsumerState<Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends ConsumerState<Settings> {
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(UserProvider.notifier).getUserInfo().then((value){
+        ref.read(enableNotificationProvider.notifier).state = value!.notificationEnabled;
+      });
+
+
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+    var user = ref.watch(UserProvider).state;
     return Scaffold(
       appBar: CustomAppBar(
         title: "الإعدادات",
@@ -53,7 +70,7 @@ class _SettingsState extends State<Settings> {
   ];
 
   Widget settingsActions(index){
-    if( index ==0 || index == 1 || index == 2 || index == 4){
+    if( index ==0 || index == 1 || index == 2 ){
       return Icon(Icons.arrow_forward_ios,size: 18,);
     }
     return SizedBox();
@@ -63,7 +80,7 @@ class _SettingsState extends State<Settings> {
     return InkWell(
       onTap: (){
         if(index == 0){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> Aqary()));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> Homepage(page: 2)));
         }
         if(index == 1){
           Navigator.push(context, MaterialPageRoute(builder: (context)=> AddHousingOffical()));
@@ -93,7 +110,27 @@ class _SettingsState extends State<Settings> {
                 Text(settingStr[index], style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16)),
               ],
             ),
-            settingsActions(index)
+            index == 3
+                ?  Transform.scale(
+                   scale: .85,
+                  child: Switch(
+                    value: ref.watch(enableNotificationProvider),
+                    onChanged: (bool value) {
+                  ref.read(enableNotificationProvider.notifier).state = ! ref.read(enableNotificationProvider.notifier).state;
+                  var enableNoti = ref.watch(enableNotificationProvider);
+                  print(enableNoti);
+                  Map<String ,dynamic> data = {
+                    "notification": enableNoti.toString(),
+                  };
+                  ref.read(UserProvider.notifier).updateUser(data);
+                  },
+                    activeColor: Colors.white,
+                    activeTrackColor: Theme.of(context).primaryColor,
+                  ),
+                ):
+            index == 4
+                ? Text("العربية")
+                :settingsActions(index)
           ],
         ),
       ),

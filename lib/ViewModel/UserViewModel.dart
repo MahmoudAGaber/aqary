@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aqary/Models/ManagedEstateModel.dart';
 import 'package:aqary/Models/RealStateModel.dart';
 import 'package:aqary/Models/UserModel.dart';
@@ -12,7 +14,7 @@ final UserProvider = StateNotifierProvider<UserNotifier, StateModel<UserModel>>(
 
 final UserPropProvider = StateNotifierProvider<UserPropritiesNotifier, StateModel<List<RealStateModel>>>((ref) => UserPropritiesNotifier(ref));
 
-final ManagedEstatesProvider = StateNotifierProvider<ManagedEstatesNotifier, StateModel<List<ManagedEstateModel>>>((ref) => ManagedEstatesNotifier(ref));
+final ManagedEstatesProvider = StateNotifierProvider<ManagedEstatesNotifier, StateModel<ManagedEstateModel>>((ref) => ManagedEstatesNotifier(ref));
 
 final EstateManagerProvider = StateNotifierProvider<EstateManagerNotifier, List<RealStateModel>>((ref) => EstateManagerNotifier(ref));
 
@@ -32,7 +34,7 @@ class UserNotifier extends StateNotifier<StateModel<UserModel>> {
   UserNotifier(this.ref) : super(StateModel.loading());
   RequestHandler requestHandler = RequestHandler();
 
-  Future<void> getUserInfo() async {
+  Future<UserModel?> getUserInfo() async {
     UserModel userModel;
     try {
       state = StateModel.loading();
@@ -42,34 +44,45 @@ class UserNotifier extends StateNotifier<StateModel<UserModel>> {
           fromJson: (json) => UserModel.fromJson(json));
 
       state = StateModel.success(userModel);
+
+      return state.data!;
     } catch (e) {
       state = StateModel.fail("SHIT");
     }
+    return null;
   }
 
   Future<void> updateUser(Map<String, dynamic> user) async {
 
     UserModel userModel;
-      Map<String ,String> anotherFields = {
-      'name': user['name'],
+    Map<String ,String> anotherFields = {};
+
+    if(user['name']!=null){
+      anotherFields = {
+        'name': user['name'],
     };
-    try {
-      state = StateModel.loading();
-       userModel = await requestHandler.patch(
+
+    }else{
+      anotherFields = {
+        'notification':user['notification']
+      };
+    }
+
+
+     // state = StateModel.loading();
+        await requestHandler.patch(
           endPoint: "/users/profile",
           requestBody: anotherFields,
-         fromJson: (json) => UserModel.fromJson(json),
+         fromJson: (json) => Map,
           auth: true,
-         file: user['pic'],
+         file: user['pic']??File(""),
       );
-      print(userModel);
 
-      state = StateModel.success(userModel);
-       print(userModel);
 
-    }catch(e){
-      state = StateModel.fail('SHIT');
-    }
+     // state = StateModel.success(userModel);
+
+
+
 
   }
 
@@ -113,19 +126,19 @@ class UserNotifier extends StateNotifier<StateModel<UserModel>> {
   }
 }
 
-class ManagedEstatesNotifier extends StateNotifier<StateModel<List<ManagedEstateModel>>> {
+class ManagedEstatesNotifier extends StateNotifier<StateModel<ManagedEstateModel>> {
   Ref ref;
   ManagedEstatesNotifier(this.ref) : super(StateModel.loading());
   RequestHandler requestHandler = RequestHandler();
 
   Future<void> getManagedEstate() async {
-    List<ManagedEstateModel> managedEstate = [];
+    ManagedEstateModel managedEstate;
     try {
       state = StateModel.loading();
       managedEstate = await requestHandler.getData(
           endPoint: "/properties/manage",
           auth: true,
-          fromJson: (json) => ManagedEstateModel.listFromJson(json));
+          fromJson: (json) => ManagedEstateModel.fromJson(json));
 
       state = StateModel.success(managedEstate);
     } catch (e) {
@@ -133,24 +146,24 @@ class ManagedEstatesNotifier extends StateNotifier<StateModel<List<ManagedEstate
     }
   }
 
-  int rentAmount(List<ManagedEstateModel> managedEstates){
-    int total = 0;
+  dynamic rentAmount(List<Manage> managedEstates){
+    dynamic total = 0;
     for(var item in managedEstates){
       total += item.rent;
     }
     return total;
   }
 
-  int deservedAmount(List<ManagedEstateModel> managedEstates){
-    int total = 0;
+  dynamic deservedAmount(List<Manage> managedEstates){
+    dynamic total = 0;
     for(var item in managedEstates){
       total += item.monthly;
     }
     return total;
   }
 
-  int paidAmount(List<ManagedEstateModel> managedEstates){
-    int total = 0;
+  dynamic  paidAmount(List<Manage> managedEstates){
+    dynamic total = 0;
     for(var item in managedEstates){
       total += item.paid;
     }

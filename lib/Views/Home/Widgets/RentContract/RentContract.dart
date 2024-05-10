@@ -7,7 +7,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../Models/RealStateModel.dart';
 import '../../../../ViewModel/UserViewModel.dart';
-import '../../../../helper/ShimmerWidget.dart';
+import '../../../../helper/Shimmer/ShimmerWidget.dart';
 import '../../../../utill/dimensions.dart';
 import '../../../base/custom_app_bar.dart';
 import '../../../base/custom_button.dart';
@@ -25,7 +25,7 @@ class _RentContractState extends ConsumerState<RentContract> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(UserPropProvider.notifier).getUserProp(UserProp.all);
+      ref.read(UserPropProvider.notifier).getUserProp(UserProp.available);
 
 
     });
@@ -34,6 +34,8 @@ class _RentContractState extends ConsumerState<RentContract> {
   @override
   Widget build(BuildContext context) {
     var userProp = ref.watch(UserPropProvider);
+    var realEstateIndex = ref.watch(contractEstateSelectionProvider);
+    var userInfo = ref.watch(UserProvider);
     return Scaffold(
       appBar: CustomAppBar(
         title: "إنشاء عقد إيجار",
@@ -49,7 +51,7 @@ class _RentContractState extends ConsumerState<RentContract> {
               height: 50,
               borderRadius: 12,
               onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> ContractDetails()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> ContractDetails(realStateModel: userProp.data![realEstateIndex],ownerName: userInfo.data!.name,ownerPhone: userInfo.data!.phone,)));
               }
           ),
         ),
@@ -100,8 +102,6 @@ class _RentContractState extends ConsumerState<RentContract> {
                                                   InkWell(
                                                     onTap: (){
                                                       ref.read(contractEstateSelectionProvider.notifier).state = index;
-                                                     // ref.read(EstateManagerProvider.notifier).addEstate(item, ref.watch(contractEstateSelectionProvider));
-                                                      print(ref.watch(estateSelectionProvider(index)));
 
                                                     },
                                                     child: Padding(

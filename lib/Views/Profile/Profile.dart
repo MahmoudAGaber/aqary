@@ -15,8 +15,11 @@ import 'package:aqary/utill/dimensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 
+import '../../helper/Shimmer/ShimmerWidget.dart';
+import '../../helper/Shimmer/shimmerProfile.dart';
 import '../base/custom_app_bar.dart';
 
 class Profile extends ConsumerStatefulWidget {
@@ -55,7 +58,21 @@ class _ProfileState extends ConsumerState<Profile> {
         child: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
           child: user.handelState<UserModel>(
-            onLoading: (state) => Center(child: SizedBox(height:30,width:30,child: CircularProgressIndicator(color: Colors.grey,))),
+            onLoading: (state) => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  children: [
+                    shimmerProfile(),
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height*.6,
+                        width: MediaQuery.of(context).size.width*.9,
+                        child: ShimmerList('Grid'))
+                  ],
+                )
+
+              ],
+            ),
             onSuccess: (state)=> Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -206,8 +223,11 @@ class _ProfileState extends ConsumerState<Profile> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width*.9,
                           child: userProp.handelState<List<RealStateModel>>(
-                              onLoading: (state) => Center(child: SizedBox(height:30,width:30,child: CircularProgressIndicator(color: Colors.grey,))),
-                            onSuccess: (state)=> GridView.builder(
+                              onLoading: (state) => Center(child: SizedBox(
+                                  height: MediaQuery.of(context).size.height*.6,
+                                  child: ShimmerList("Grid")),),
+                            onSuccess: (state)=> userProp.data!.isNotEmpty
+                                ?GridView.builder(
                                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2, // number of items in each row
                                     mainAxisSpacing: 2.0, // spacing between rows
@@ -329,7 +349,62 @@ class _ProfileState extends ConsumerState<Profile> {
                                       ],
                                     ),
                                   );
-                                }),
+                                })
+                                :Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 20),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 185,
+                                        width: 185,
+                                        child: Stack(
+                                          children: [
+                                            SvgPicture.asset("assets/images/Ellipse2.svg",colorFilter: ColorFilter.linearToSrgbGamma(),),
+                                            Center(child: Container(width: 80,height:80,decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(50)),)),
+                                            Center(child: SvgPicture.asset("assets/images/aqary.svg",height: 30,width: 30,color: Theme.of(context).primaryColor,)),
+                                            Positioned(
+                                              top: 48,
+                                              right: 50,
+                                              child: Text('Z',
+                                                style: TextStyle(
+                                                    color: Theme.of(context).primaryColor,
+                                                    fontSize: Dimensions.fontSizeExtraLarge,
+                                                    fontWeight: FontWeight.bold
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 65,
+                                              right: 65,
+                                              child: Text('Z',
+                                                style: TextStyle(
+                                                    color: Theme.of(context).primaryColor,
+                                                    fontSize: Dimensions.fontSizeDefault,
+                                                    fontWeight: FontWeight.bold
+                                                ),
+                                              ),
+                                            )
+
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        children: [
+                                          Text("لا يوجد عقارات",
+                                            style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 22),overflow: TextOverflow.clip,),
+                                          SizedBox(height: Dimensions.paddingSizeSmall,),
+                                          Text("لا يوجد عقارات متوفره في الوقت الحالي",
+                                              style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey,overflow: TextOverflow.clip,))
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                             onFailure: (state)=> Text("....")
                           )
                         )

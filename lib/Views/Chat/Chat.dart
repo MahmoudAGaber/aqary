@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../ViewModel/ChatViewModel.dart';
+import '../../helper/Shimmer/ChatListShimmer.dart';
 import '../../helper/date_converter.dart';
 import '../../utill/dimensions.dart';
 import '../base/custom_app_bar.dart';
@@ -106,7 +107,9 @@ class _ChatState extends ConsumerState<Chat> {
                         future: FirebaseServices().getUserChatsStream(),
                       builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return SizedBox(
+                              height: 500,
+                                child: ChatListShimmer());
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -161,6 +164,7 @@ class _ChatState extends ConsumerState<Chat> {
                               ],
                             );
                           } else {
+                            print(snapshot.data!.length);
                             final chatDocs = snapshot.data!;
                             return RefreshIndicator(
                               onRefresh: refreshData,
@@ -168,9 +172,7 @@ class _ChatState extends ConsumerState<Chat> {
                                   shrinkWrap: true,
                                   itemCount: chatDocs.length,
                                   itemBuilder: (context, index) {
-                                    if(chatDocs[index].docs.isNotEmpty){
                                       var item = chatDocs[index].docs[0];
-
                                     return Dismissible(
                                       key: Key("Uniqe"),
                                       direction: DismissDirection.startToEnd,
@@ -283,7 +285,7 @@ class _ChatState extends ConsumerState<Chat> {
                                                   ),
                                                 ),
                                               );}
-                                                          }),
+                          ),
                             );
                           }
                         })

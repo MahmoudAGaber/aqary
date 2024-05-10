@@ -10,6 +10,9 @@ final NotificationProvider = StateNotifierProvider<NotificationNotifier, StateMo
 
 final notificationsCountProvider = StateProvider<int>((ref) => 0);
 
+final enableNotificationProvider = StateProvider<bool>((ref) => true);
+
+
 
 class NotificationNotifier extends StateNotifier<StateModel<List<NotificationModel>>>{
   Ref ref;

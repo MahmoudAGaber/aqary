@@ -5,7 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../helper/ShimmerWidget.dart';
+import '../../../helper/Shimmer/ShimmerWidget.dart';
 
 class Banners extends ConsumerStatefulWidget {
    Banners({super.key});

@@ -2,8 +2,8 @@
 class NotificationModel {
   final String id;
   final String type;
-  final String title;
-  final String body;
+  LocalizedText title;
+  LocalizedText body;
   bool isRead;
   final String user;
   final String contract;
@@ -28,8 +28,8 @@ class NotificationModel {
     return NotificationModel(
       id: json['_id'],
       type: json['type'],
-      title: json['title'],
-      body: json['body'],
+      title: LocalizedText.fromJson(json['title']),
+      body: LocalizedText.fromJson(json['body']),
       isRead: json['is_read'],
       user: json['user'],
       contract: json['contract'],
@@ -43,8 +43,8 @@ class NotificationModel {
     return {
       '_id': id,
       'type': type,
-      'title': title,
-      'body': body,
+      'title': title.toJson(),
+      'body': body.toJson(),
       'is_read': isRead,
       'user': user,
       'contract': contract,
@@ -57,4 +57,24 @@ class NotificationModel {
   static List<NotificationModel> listFromJson(List jsonData){
     return jsonData.map((e) => NotificationModel.fromJson(e)).toList();
   }
+}
+
+class LocalizedText {
+  String ar;
+  String en;
+
+  LocalizedText({
+    required this.ar,
+    required this.en,
+  });
+
+  factory LocalizedText.fromJson(Map<String, dynamic> json) => LocalizedText(
+    ar: json['ar'],
+    en: json['en'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'ar': ar,
+    'en': en,
+  };
 }

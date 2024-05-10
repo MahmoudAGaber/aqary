@@ -3,7 +3,7 @@
 
 import 'package:aqary/ViewModel/RealStateViewModel.dart';
 import 'package:aqary/Views/base/custom_app_bar.dart';
-import 'package:aqary/helper/ShimmerWidget.dart';
+import 'package:aqary/helper/Shimmer/ShimmerWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

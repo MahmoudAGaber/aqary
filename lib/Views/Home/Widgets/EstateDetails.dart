@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../Models/ChatModel.dart';
 import '../../../ViewModel/RealStateViewModel.dart';
@@ -407,7 +408,7 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
                     borderRadius: 12,
                     textColor: Colors.white,
                     onPressed: (){
-
+                      makePhoneCall(stateDetails.data!.data.createdBy['phone']);
                     }
                 ),
               ),
@@ -465,4 +466,17 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
       ),
     );
   }
+
+  Future<void> makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      throw 'Could not launch $launchUri';
+    }
+  }
 }
+

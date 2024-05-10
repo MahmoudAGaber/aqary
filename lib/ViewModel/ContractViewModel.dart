@@ -55,6 +55,8 @@ class ContractNotifier extends StateNotifier<StateModel<ContractModel>>{
           auth: true,
           filePath: data.file.path,
           fieldName: 'contract',
+          signaturePath: data.renter_signature.path,
+          signatureFieldName: 'renter_signature',
           requestBody: data.toJson());
     }catch(e){
       print("Error to Send Contract$e");

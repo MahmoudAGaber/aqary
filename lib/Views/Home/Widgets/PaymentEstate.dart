@@ -19,7 +19,8 @@ import 'EstateDetails.dart';
 
 class PaymentEstate extends ConsumerStatefulWidget {
   String contractId;
-  PaymentEstate({super.key, required this.contractId});
+  String type;
+  PaymentEstate({super.key, required this.contractId,required this.type});
 
   @override
   ConsumerState<PaymentEstate> createState() => _PaymentEstateState();
@@ -310,233 +311,238 @@ class _PaymentEstateState extends ConsumerState<PaymentEstate> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: Dimensions.paddingSizeLarge,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                         widget.type == 'prepaid'? Column(
                             children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 6),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("طريقة الدفع",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!),
-                                    InkWell(
-                                        onTap: () {
-                                          openDialog(
-                                            widgetPaymentType(context),
-                                            context,
-                                            isDismissible: true,
-                                            isDialog: true,
-                                            willPop: true,
-                                          );
-                                        },
-                                        child: Text("تغيير", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Color(0xFF677294),
-                                        ))
-                                    ),
-                                  ],
-                                ),
-                              ),
                               SizedBox(
-                                height: Dimensions.paddingSizeSmall,
+                                height: Dimensions.paddingSizeLarge,
                               ),
-                              paymentType == PaymentType.cash
-                                  ? Container(
-                                  height: 50,
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      border: Border.all(
-                                        color: Color(0xFFECEDF3),
-                                      )),
-                                  child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                                      child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            SvgPicture.asset("assets/images/cash.svg", height: 25,
-                                            ),
-                                            SizedBox(
-                                              width: Dimensions.paddingSizeExtraSmall,
-                                            ),
-                                            Padding(
-                                                padding: const EdgeInsets.symmetric(
-                                                        horizontal: 6),
-                                                child: Text("كاش",
-                                                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold))),
-                                          ]
-                                        )))
-                                      : Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Row(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("طريقة الدفع",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!),
+                                        InkWell(
+                                            onTap: () {
+                                              openDialog(
+                                                widgetPaymentType(context),
+                                                context,
+                                                isDismissible: true,
+                                                isDialog: true,
+                                                willPop: true,
+                                              );
+                                            },
+                                            child: Text("تغيير", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Color(0xFF677294),
+                                            ))
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: Dimensions.paddingSizeSmall,
+                                  ),
+                                  paymentType == PaymentType.cash
+                                      ? Container(
+                                      height: 50,
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(15),
+                                          border: Border.all(
+                                            color: Color(0xFFECEDF3),
+                                          )),
+                                      child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                                          child: Row(
                                               mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
                                                 SvgPicture.asset("assets/images/cash.svg", height: 25,
                                                 ),
-                                                SizedBox(width: Dimensions.paddingSizeExtraSmall,),
+                                                SizedBox(
+                                                  width: Dimensions.paddingSizeExtraSmall,
+                                                ),
                                                 Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                                                    child: Text("تحويل بنكي", style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold))),
-                                              ],
-                                            ),
-                                            SizedBox(height: Dimensions.paddingSizeDefault,),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                bankPaymentImage.isNotEmpty
-                                                    ? Stack(
-                                                      children: [
-                                                        Align(
-                                                          alignment: Alignment.bottomCenter,
-                                                          child: SizedBox(
-                                                            height: 200,width: 320,
-                                                            child: ClipRRect(
-                                                                borderRadius: BorderRadius.circular(8),
-                                                            child: Image.file(File(bankPaymentImage.first.path),fit: BoxFit.cover,)),
-                                                          ),
-                                                        ),
-                                                        InkWell(
-                                                          onTap: (){
-                                                            ref.read(BankPaymentImageProvider.notifier).getBankImage();
-                                                          },
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.all(8.0),
-                                                            child: CircleAvatar(
-                                                              radius: 12,
-                                                                backgroundColor: Theme.of(context).primaryColor,
-                                                                child: Icon(Icons.replay,color: Colors.white,size: 18,)),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    )
-                                                    :InkWell(
-                                                  onTap: () {
-                                                    ref.read(BankPaymentImageProvider.notifier).getBankImage();
-                                                  },
-                                                  child: Center(
-                                                    child: Container(
-                                                      height: 120,
-                                                      width: MediaQuery.of(context).size.width*.9,
-                                                      padding: const EdgeInsets.all(15),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(color: Theme.of(context).primaryColor),
-                                                        borderRadius: BorderRadius.circular(12)
-                                                        ),
-                                                      child: Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding: const EdgeInsets.all(2.0),
-                                                            child: Image.asset("assets/images/addBank.png",
-                                                              width: 40,
-                                                              height: 40,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8,),
-                                                          Text("إضافة صور التحويل البنكي", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor),)
-                                                        ],
+                                                    padding: const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                    child: Text("كاش",
+                                                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold))),
+                                              ]
+                                          )))
+                                      : Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          SvgPicture.asset("assets/images/cash.svg", height: 25,
+                                          ),
+                                          SizedBox(width: Dimensions.paddingSizeExtraSmall,),
+                                          Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6),
+                                              child: Text("تحويل بنكي", style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold))),
+                                        ],
+                                      ),
+                                      SizedBox(height: Dimensions.paddingSizeDefault,),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          bankPaymentImage.isNotEmpty
+                                              ? Stack(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.bottomCenter,
+                                                child: SizedBox(
+                                                  height: 200,width: 320,
+                                                  child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      child: Image.file(File(bankPaymentImage.first.path),fit: BoxFit.cover,)),
+                                                ),
+                                              ),
+                                              InkWell(
+                                                onTap: (){
+                                                  ref.read(BankPaymentImageProvider.notifier).getBankImage();
+                                                },
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: CircleAvatar(
+                                                      radius: 12,
+                                                      backgroundColor: Theme.of(context).primaryColor,
+                                                      child: Icon(Icons.replay,color: Colors.white,size: 18,)),
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                              :InkWell(
+                                            onTap: () {
+                                              ref.read(BankPaymentImageProvider.notifier).getBankImage();
+                                            },
+                                            child: Center(
+                                              child: Container(
+                                                height: 120,
+                                                width: MediaQuery.of(context).size.width*.9,
+                                                padding: const EdgeInsets.all(15),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(color: Theme.of(context).primaryColor),
+                                                    borderRadius: BorderRadius.circular(12)
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: Image.asset("assets/images/addBank.png",
+                                                        width: 40,
+                                                        height: 40,
                                                       ),
                                                     ),
-                                                  ),
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                                    SizedBox(height: 8,),
+                                                    Text("إضافة صور التحويل البنكي", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).primaryColor),)
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
 
 
-                            ],
-                          ),
-                          SizedBox(
-                            height: Dimensions.paddingSizeLarge,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 6),
-                                child: Text("ملاحظات",
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge!),
+                                ],
                               ),
                               SizedBox(
-                                height: Dimensions.paddingSizeSmall,
+                                height: Dimensions.paddingSizeLarge,
                               ),
-                              TextFormField(
-                                controller: paymentNotesController,
-                                textDirection: TextDirection.rtl,
-                                cursorColor: Colors.grey,
-                                maxLines: 3,
-                                style: TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                    fillColor: Color(0xFFF9FAFA),
-                                    filled: true,
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6),
-                                    hintText: "اكتب ملاحظاتك هنا",
-                                    hintStyle: TextStyle(
-                                        color: Colors.grey, fontSize: 14),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                          color: Color(0xFFF9FAFA),
-                                        )),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                            color:
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                    child: Text("ملاحظات",
+                                        style:
+                                        Theme.of(context).textTheme.titleLarge!),
+                                  ),
+                                  SizedBox(
+                                    height: Dimensions.paddingSizeSmall,
+                                  ),
+                                  TextFormField(
+                                    controller: paymentNotesController,
+                                    textDirection: TextDirection.rtl,
+                                    cursorColor: Colors.grey,
+                                    maxLines: 3,
+                                    style: TextStyle(color: Colors.black),
+                                    decoration: InputDecoration(
+                                        fillColor: Color(0xFFF9FAFA),
+                                        filled: true,
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 6),
+                                        hintText: "اكتب ملاحظاتك هنا",
+                                        hintStyle: TextStyle(
+                                            color: Colors.grey, fontSize: 14),
+                                        enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                            borderSide: BorderSide(
+                                              color: Color(0xFFF9FAFA),
+                                            )),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                            borderSide: BorderSide(
+                                                color:
                                                 Theme.of(context).primaryColor))),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'من فضلك  قوم بتدوين الدفع';
-                                  }
-                                  return null;
-                                },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'من فضلك  قوم بتدوين الدفع';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: Dimensions.paddingSizeLarge,
-                          ),
-                          CustomButton(
-                            onPressed: () {
-                              if(_formKey.currentState!.validate()){
-                                Map<String, String> data = {
-                                  'payment_type': paymentType.name,
-                                  'note' : paymentNotesController.text,
-                                  'amount': contract.data!.first.monthlyPrice.toString()
-                                };
-                                if(paymentType == PaymentType.cash){
-                                  ref.read(PaymentPayProvider.notifier).estatePay(widget.contractId, "", data);
-                                }
-                                else if(paymentType == PaymentType.bank){
-                                  if(bankPaymentImage.isNotEmpty){
-                                    print("OK");
-                                    ref.read(PaymentPayProvider.notifier).estatePay(
-                                        widget.contractId, bankPaymentImage.first.path, data);
-                                  }else{
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("من فضلك قوم باختيار صوره للتحويل البنكي"),duration: Duration(seconds: 2),));
+                              SizedBox(
+                                height: Dimensions.paddingSizeLarge,
+                              ),
+                              CustomButton(
+                                onPressed: () {
+                                  if(_formKey.currentState!.validate()){
+                                    Map<String, String> data = {
+                                      'payment_type': paymentType.name,
+                                      'note' : paymentNotesController.text,
+                                      'amount': contract.data!.first.monthlyPrice.toString()
+                                    };
+                                    if(paymentType == PaymentType.cash){
+                                      ref.read(PaymentPayProvider.notifier).estatePay(widget.contractId, "", data);
+                                    }
+                                    else if(paymentType == PaymentType.bank){
+                                      if(bankPaymentImage.isNotEmpty){
+                                        print("OK");
+                                        ref.read(PaymentPayProvider.notifier).estatePay(
+                                            widget.contractId, bankPaymentImage.first.path, data);
+                                      }else{
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("من فضلك قوم باختيار صوره للتحويل البنكي"),duration: Duration(seconds: 2),));
+                                      }
+
+                                    }
+                                    Navigator.pop(context);
+                                    showAnimatedDialog(
+                                        context, dismissible: false, estateAdded());
                                   }
 
-                                }
-                                Navigator.pop(context);
-                                showAnimatedDialog(
-                                    context, dismissible: false, estateAdded());
-                              }
+                                },
+                                buttonText: "تم",
+                                textColor: Colors.white,
+                                backgroundColor: Theme.of(context).primaryColor,
+                              )
+                            ],
+                          ):SizedBox()
 
-                            },
-                            buttonText: "تم",
-                            textColor: Colors.white,
-                            backgroundColor: Theme.of(context).primaryColor,
-                          )
                         ],
                       ),
                 ),

@@ -2,6 +2,7 @@
 
 import 'dart:collection';
 
+import 'package:aqary/Models/RealStateModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,7 +14,10 @@ import '../../../base/custom_button.dart';
 import '../AddEstate/AddEstate.dart';
 
 class ContractDetails extends ConsumerStatefulWidget {
-  const ContractDetails({super.key});
+  RealStateModel realStateModel;
+  String ownerName;
+  String ownerPhone;
+  ContractDetails({super.key,required this.ownerName,required this.ownerPhone,required this.realStateModel});
 
   @override
   ConsumerState<ContractDetails> createState() => _ContractDetailsState();
@@ -21,13 +25,30 @@ class ContractDetails extends ConsumerStatefulWidget {
 
 class _ContractDetailsState extends ConsumerState<ContractDetails> {
 
+  TextEditingController ownerEditingController = TextEditingController();
+  TextEditingController renterEditingController = TextEditingController();
+  TextEditingController ownerPhoneEditingController = TextEditingController();
+  TextEditingController renterPhoneEditingController = TextEditingController();
+  TextEditingController noteEditingController = TextEditingController();
+  TextEditingController monthlyPriceEditingController = TextEditingController();
+
+
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ownerEditingController.text = widget.ownerName;
+      ownerPhoneEditingController.text = widget.ownerPhone;
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     var paymentSystem = ref.watch(paymentsSystemProvider);
 
     return  Scaffold(
       appBar: CustomAppBar(
-        title: "تفاصيل العقد",
+        title: "تفاصيل إنشاء العقد",
         isCenter: true,
         isBackButtonExist: true,
       ),
@@ -47,10 +68,11 @@ class _ContractDetailsState extends ConsumerState<ContractDetails> {
                         ),
                         SizedBox(height: Dimensions.paddingSizeSmall,),
                         TextFormField(
-                          //  controller: searchController,
+                          enabled: false,
+                            controller: ownerEditingController,
                           textDirection: TextDirection.rtl,
                           cursorColor: Colors.grey,
-                          style: TextStyle(color: Colors.black),
+                          style: TextStyle(color: Colors.black,fontSize: 15),
                           decoration: InputDecoration(
                               fillColor: Color(0xFFF9FAFA),
                               filled: true,
@@ -89,10 +111,11 @@ class _ContractDetailsState extends ConsumerState<ContractDetails> {
                         ),
                         SizedBox(height: Dimensions.paddingSizeSmall,),
                         TextFormField(
-                          //  controller: searchController,
+                          enabled: false,
+                          controller: ownerPhoneEditingController,
                           textDirection: TextDirection.rtl,
                           cursorColor: Colors.grey,
-                          style: TextStyle(color: Colors.black),
+                          style: TextStyle(color: Colors.black,fontSize: 15),
                           decoration: InputDecoration(
                               fillColor: Color(0xFFF9FAFA),
                               filled: true,
@@ -131,7 +154,7 @@ class _ContractDetailsState extends ConsumerState<ContractDetails> {
                         ),
                         SizedBox(height: Dimensions.paddingSizeSmall,),
                         TextFormField(
-                          //  controller: searchController,
+                          controller: renterEditingController,
                           textDirection: TextDirection.rtl,
                           cursorColor: Colors.grey,
                           style: TextStyle(color: Colors.black),
@@ -173,7 +196,7 @@ class _ContractDetailsState extends ConsumerState<ContractDetails> {
                         ),
                         SizedBox(height: Dimensions.paddingSizeSmall,),
                         TextFormField(
-                          //  controller: searchController,
+                          controller: renterPhoneEditingController,
                           textDirection: TextDirection.rtl,
                           cursorColor: Colors.grey,
                           style: TextStyle(color: Colors.black),
@@ -268,7 +291,7 @@ class _ContractDetailsState extends ConsumerState<ContractDetails> {
                         ),
                         SizedBox(height: Dimensions.paddingSizeSmall,),
                         TextFormField(
-                          //  controller: searchController,
+                          controller: noteEditingController,
                           textDirection: TextDirection.rtl,
                           cursorColor: Colors.grey,
                           maxLines: 5,

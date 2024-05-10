@@ -46,13 +46,14 @@ class RequestHandler {
     required String endPoint,
     String param = '',
     bool auth = false,
+    required String method,
     required Map<String, String> requestBody,
     dynamic model
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String url = mainUrl + endPoint + param;
 
-    var request = http.MultipartRequest('POST', Uri.parse(url));
+    var request = http.MultipartRequest(method, Uri.parse(url));
 
     // Add headers
     // Authorization
@@ -85,8 +86,8 @@ class RequestHandler {
         throw Exception('Server responded with status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error during the POST request: $e');
-      throw Exception('Failed to make the POST request');
+      print('Error during the $method request: $e');
+      throw Exception('Failed to make the $method request');
     }
   }
 
@@ -97,7 +98,9 @@ class RequestHandler {
     bool auth = false,
     required Map<String, String> requestBody,
     String? filePath,
-    String? fieldName
+    String? fieldName,
+    String? signaturePath,
+    String? signatureFieldName
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String url = mainUrl + endPoint + param;
@@ -120,6 +123,14 @@ class RequestHandler {
       http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
         fieldName!, filePath,);
       request.files.add(multipartFile);
+    }
+
+    if (signaturePath !=null) {
+      http.MultipartFile signatureFile = await http.MultipartFile.fromPath(
+        signatureFieldName!,
+        signaturePath,
+      );
+      request.files.add(signatureFile);
     }
 
 
@@ -235,6 +246,7 @@ class RequestHandler {
 
     if (response.statusCode == 200) {
       dynamic decodedResponse = json.decode(response.body);
+      print(decodedResponse);
       return fromJson(decodedResponse);
     } else {
       print('Failed with status code: ${response.statusCode}');
