@@ -63,6 +63,7 @@ class ContractMine {
   String paymentType;
   String note;
   String renter_signature;
+  String owner_signature;
   String contract;
   String status;
   List<dynamic> payments;
@@ -84,6 +85,7 @@ class ContractMine {
     required this.note,
     required this.contract,
     required this.renter_signature,
+    required this.owner_signature,
     required this.status,
     required this.payments,
     required this.createdAt,
@@ -94,24 +96,25 @@ class ContractMine {
 
   factory ContractMine.fromJson(Map<String, dynamic> json) {
     return ContractMine(
-      id: json['_id'],
+      id: json['_id'] ?? "",
       property: RealStateModel.fromJson(json['property']),
-      renter: json['renter'],
-      owner: json['owner'],
-      from: json['from'],
-      to: json['to'],
-      paymentDuration: json['payment_duration'],
-      monthlyPrice: json['monthly_price'].toDouble(),
-      paymentType: json['payment_type'],
-      note: json['note'],
-      contract: json['contract'],
-      renter_signature: json['renter_signature'],
-      status: json['status'],
-      payments: json['payments'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-      v: json['__v'],
-      isOwner: json['is_owner'],
+      renter: json['renter']??"",
+      owner: json['owner']??"",
+      from: json['from']??"",
+      to: json['to']??"",
+      paymentDuration: json['payment_duration'] ??"",
+      monthlyPrice: json['monthly_price'].toDouble() ??0,
+      paymentType: json['payment_type']??"",
+      note: json['note']??"",
+      contract: json['contract']??"",
+      renter_signature: json['renter_signature']??"",
+      owner_signature: json['owner_signature']??"",
+      status: json['status']??"",
+      payments: json['payments']??"",
+      createdAt: json['createdAt'] ??"",
+      updatedAt: json['updatedAt'] ??"",
+      v: json['__v']??"",
+      isOwner: json['is_owner']??false,
     );
   }
 
@@ -119,3 +122,4 @@ class ContractMine {
     return jsonData.map((e) => ContractMine.fromJson(e)).toList();
   }
 }
+

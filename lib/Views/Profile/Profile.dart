@@ -30,11 +30,15 @@ class Profile extends ConsumerStatefulWidget {
 }
 
 class _ProfileState extends ConsumerState<Profile> {
+
+  List<RealStateModel> realsEstate = [];
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(UserProvider.notifier).getUserInfo();
-      ref.read(UserPropProvider.notifier).getUserProp(UserProp.all);
+      ref.read(UserPropProvider.notifier).getUserProp(UserProp.all).then((value){
+        realsEstate = value!;
+      });
 
     });
     super.initState();
@@ -150,7 +154,7 @@ class _ProfileState extends ConsumerState<Profile> {
                                 InkWell(
                                     onTap: (){
                                       ref.read(userPropSelectionProvider.notifier).state = UserProp.available;
-                                      ref.read(UserPropProvider.notifier).getUserProp(UserProp.available);
+                                      ref.read(UserPropProvider.notifier).getUserPropSelection(UserProp.available,realsEstate);
                                   },
                                   child: Container(
                                     decoration: ShapeDecoration(
@@ -173,7 +177,7 @@ class _ProfileState extends ConsumerState<Profile> {
                                   onTap: (){
                                     ref.read(userPropSelectionProvider.notifier).state = UserProp.notAvailable;
 
-                                    ref.read(UserPropProvider.notifier).getUserProp(UserProp.notAvailable);
+                                    ref.read(UserPropProvider.notifier).getUserPropSelection(UserProp.notAvailable,realsEstate);
                                   },
                                   child: Container(
                                     decoration: ShapeDecoration(
@@ -196,7 +200,7 @@ class _ProfileState extends ConsumerState<Profile> {
                                 InkWell(
                                   onTap: (){
                                     ref.read(userPropSelectionProvider.notifier).state = UserProp.all;
-                                    ref.read(UserPropProvider.notifier).getUserProp(UserProp.all);
+                                    ref.read(UserPropProvider.notifier).getUserPropSelection(UserProp.all,realsEstate);
                                   },
                                   child: Container(
                                     decoration: ShapeDecoration(

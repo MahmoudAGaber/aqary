@@ -15,8 +15,8 @@ class FileHandleApi {
     final bytes = await pdf.save();
 
     // final dir = await getApplicationDocumentsDirectory();
-    final dir = await getExternalStorageDirectory();
-    final file = File('${dir?.path}/$name');
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/$name');
     await file.writeAsBytes(bytes);
     print(file.path);
     return file;
@@ -24,8 +24,8 @@ class FileHandleApi {
 
 
   static Future<Widget> filePath() async {
-    final dir = await getExternalStorageDirectory();
-   return SfPdfViewer.file(File('${dir?.path}/my_invoice.pdf'));
+    final dir = await getApplicationDocumentsDirectory();
+   return SfPdfViewer.file(File('${dir.path}/my_invoice.pdf'));
 
   }
 }

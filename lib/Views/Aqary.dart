@@ -182,15 +182,19 @@ class _AqaryState extends ConsumerState<Aqary>  with SingleTickerProviderStateMi
                                                             ],
                                                           ),
                                                         ),
-                                                        const PopupMenuItem<SampleItem>(
+                                                         PopupMenuItem<SampleItem>(
                                                           value: SampleItem.itemThree,
                                                           child: Row(
                                                             children: [
                                                               Icon(CupertinoIcons.delete ,size: 18,),
                                                               SizedBox(width: 8,),
                                                               Text('حذف',style: TextStyle(color: Colors.black,fontSize: 15),),
+
                                                             ],
                                                           ),
+                                                           onTap: (){
+                                                            ref.read(ManagedEstatesProvider.notifier).deleteManagedEstate(item.contractId);
+                                                           },
                                                         ),
                                                       ],
                                                     ),
@@ -266,7 +270,8 @@ class _AqaryState extends ConsumerState<Aqary>  with SingleTickerProviderStateMi
                                           decoration: BoxDecoration(
                                               border: Border(top: BorderSide(color: Theme.of(context).primaryColor))
                                           ),
-                                          child: Padding(
+                                          child: managedEstates.data!.manage.isNotEmpty
+                                              ? Padding(
                                             padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 6),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -287,7 +292,8 @@ class _AqaryState extends ConsumerState<Aqary>  with SingleTickerProviderStateMi
                                                     child: Center(child: Text(DateConverter.numberFormat(ref.watch(ManagedEstatesProvider.notifier).paidAmount(managedEstates.data!.manage)).toString(),style: Theme.of(context).textTheme.titleSmall,))),
                                               ],
                                             ),
-                                          ),
+                                          )
+                                              :SizedBox(),
                                         ),
                                       ],
                                     ),

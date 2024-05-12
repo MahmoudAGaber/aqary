@@ -69,14 +69,10 @@ class _HomepageState extends ConsumerState<Homepage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: _tabs[_currentIndex!],
-      bottomNavigationBar: BottomAppBar(
-        padding: EdgeInsets.only(top: 3),
-        shape: CircularNotchedRectangle(),
-        elevation: 10,
-        height: 70,
-        color: Theme.of(context).primaryColor.withOpacity(0.4),
-        child: BottomNavigationBar(
+      body: IndexedStack(
+        index: _currentIndex,
+          children: _tabs,),
+      bottomNavigationBar:BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex!,
           onTap: (index) {
@@ -102,7 +98,7 @@ class _HomepageState extends ConsumerState<Homepage> {
             ),
             BottomNavigationBarItem(
               icon: Padding(
-                padding: const EdgeInsets.only(right: 16,left: 16),
+                padding: const EdgeInsets.only(right: 15,left: 15),
                 child: Container(
                   width: 100,
                   height: 30,
@@ -148,8 +144,7 @@ class _HomepageState extends ConsumerState<Homepage> {
 
           ],
         ),
-      ),
-    );
+      );
   }
 
   void onTabTapped(int index){

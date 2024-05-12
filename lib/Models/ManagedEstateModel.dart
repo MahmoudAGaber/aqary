@@ -16,12 +16,14 @@ class ManagedEstateModel{
 }
 class Manage {
   String id;
+  String contractId;
   dynamic rent;
   dynamic monthly;
   dynamic paid;
 
   Manage({
     required this.id,
+    required this.contractId,
     required this.rent,
     required this.monthly,
     required this.paid,
@@ -30,6 +32,7 @@ class Manage {
   factory Manage.fromJson(Map<String, dynamic> json) {
     return Manage(
       id: json['id'],
+      contractId: json['contract_id'],
       rent: json['rent'],
       monthly: json['monthly'],
       paid: json['paid'],
@@ -59,6 +62,8 @@ class Renter {
   final String paymentType;
   final dynamic paid;
   final dynamic rent;
+  String contractId;
+
 
   Renter({
     required this.propertyName,
@@ -68,6 +73,7 @@ class Renter {
     required this.paymentType,
     required this.paid,
     required this.rent,
+    required this.contractId
   });
 
   factory Renter.fromJson(Map<String, dynamic> json) {
@@ -79,6 +85,8 @@ class Renter {
       paymentType: json['payment_type'],
       paid: json['paid'],
       rent: json['rent'],
+      contractId: json['contract_id'],
+
     );
   }
 

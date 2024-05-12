@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -12,6 +14,11 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>nb</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>aqary</string>
 	<key>CFBundlePackageType</key>
@@ -20,9 +27,43 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-1032051706704-ios-bcc6d978d851c95b8d7a55</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+    	<array>
+    		<string>fetch</string>
+    		<string>location</string>
+    		<string>remote-notification</string>
+    	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Need access to the camera to take photos</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>By allowing the app to access the location, the app will be able to locate your current location and update your current rider about your current location in real-time.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>By allowing the app to access the location, the app will be able to locate your current location and update your current rider about your current location in real-time.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Need access to microphone for recording videos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need access to the photo library</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -41,15 +82,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>CFBundleLocalizations</key>
-    <array>
-    	<string>en</string>
-    	<string>nb</string>
-    </array>
-
 </dict>
 </plist>

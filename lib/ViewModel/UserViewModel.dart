@@ -27,6 +27,8 @@ final updateUserLoadingProvider = StateProvider<bool>((ref) => false);
 
 final userPropSelectionProvider = StateProvider<UserProp>((ref) => UserProp.all);
 
+final deleteEstateLoadingProvider = StateProvider<bool>((ref) => false);
+
 
 
 class UserNotifier extends StateNotifier<StateModel<UserModel>> {
@@ -146,6 +148,30 @@ class ManagedEstatesNotifier extends StateNotifier<StateModel<ManagedEstateModel
     }
   }
 
+  void deleteManagedEstate(contractId)async{
+    List<Manage> managedList = [];
+    List<Renter> renterList = [];
+    ManagedEstateModel? managedEstateModel;
+
+    managedList = state.data!.manage;
+    renterList = state.data!.renter;
+
+    managedEstateModel = state.data;
+    managedList.removeWhere((estate) => estate.contractId == contractId);
+    renterList.removeWhere((estate) => estate.contractId == contractId);
+
+    managedEstateModel!.manage = managedList;
+
+    state = StateModel.success(managedEstateModel);
+
+      await requestHandler.deleteData(
+        endPoint: "/contracts/$contractId",
+        auth: true,);
+
+
+
+  }
+
   dynamic rentAmount(List<Manage> managedEstates){
     dynamic total = 0;
     for(var item in managedEstates){
@@ -156,8 +182,10 @@ class ManagedEstatesNotifier extends StateNotifier<StateModel<ManagedEstateModel
 
   dynamic deservedAmount(List<Manage> managedEstates){
     dynamic total = 0;
-    for(var item in managedEstates){
-      total += item.monthly;
+    if(managedEstates.isNotEmpty){
+      for(var item in managedEstates){
+        total += item.monthly;
+      }
     }
     return total;
   }
@@ -177,7 +205,7 @@ class UserPropritiesNotifier extends StateNotifier<StateModel<List<RealStateMode
   UserPropritiesNotifier(this.ref) : super(StateModel.loading());
   RequestHandler requestHandler = RequestHandler();
 
-  Future<void> getUserProp(UserProp userPropSelection) async {
+  Future<List<RealStateModel>?> getUserProp(UserProp userPropSelection) async {
     UserModel userModel;
     List<RealStateModel> prop = [];
     try {
@@ -199,10 +227,36 @@ class UserPropritiesNotifier extends StateNotifier<StateModel<List<RealStateMode
       }
 
       state = StateModel.success(prop);
+      return state.data;
+    } catch (e) {
+      state = StateModel.fail("SHIT");
+    }
+    return null;
+  }
+
+  Future<void> getUserPropSelection(UserProp userPropSelection,List<RealStateModel> realEstate) async {
+    UserModel userModel;
+    List<RealStateModel> prop = [];
+    try {
+
+      prop.clear();
+      if(userPropSelection == UserProp.available){
+        realEstate.forEach((element) { element.isAvailable == true? prop.add(element):[];});
+      }
+      if(userPropSelection == UserProp.notAvailable){
+        realEstate.forEach((element) { element.isAvailable == false? prop.add(element):[];});
+      }
+      if(userPropSelection == UserProp.all){
+        realEstate.forEach((element) { prop.add(element);});
+      }
+
+      state = StateModel.success(prop);
     } catch (e) {
       state = StateModel.fail("SHIT");
     }
   }
+
+
 }
 
 class EstateManagerNotifier extends StateNotifier<List<RealStateModel>> {

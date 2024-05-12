@@ -35,13 +35,9 @@ class _PaymentEstateState extends ConsumerState<PaymentEstate> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      ref
-          .read(ContractMineProvider.notifier)
-          .getOneContract(widget.contractId)
-          .then((value) async {
-        await ref
-            .read(RealStateGetOneProvider.notifier)
-            .getOneEstate(value!.property.id!);
+      await ref.read(ContractMineProvider.notifier).getOneContract(widget.contractId).then((value) async {
+        print("HOHO${value}");
+        await ref.read(RealStateGetOneProvider.notifier).getOneEstate(value!.property.id!);
       });
     });
     super.initState();

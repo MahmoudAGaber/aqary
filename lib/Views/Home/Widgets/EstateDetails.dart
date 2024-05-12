@@ -361,7 +361,6 @@ class _EstateDetailsState extends ConsumerState<EstateDetails> {
                                             target: LatLng(item.lat,item.long),
                                             zoom: 14.3,
                                           ),
-                                          liteModeEnabled: true,
                                           mapType: MapType.terrain,
                                           indoorViewEnabled: false,
                                           mapToolbarEnabled: false,

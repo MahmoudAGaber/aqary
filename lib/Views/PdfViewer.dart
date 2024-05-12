@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PdfViewer extends StatelessWidget {
-  const PdfViewer({super.key});
+  String filePath;
+   PdfViewer({super.key,required this.filePath});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,6 @@ class PdfViewer extends StatelessWidget {
         title: "معاينة العقد",
       ),
         body: SfPdfViewer.file(
-            File('/storage/emulated/0/Android/data/com.mks.aqary/files/my_invoice.pdf')));
+            File('$filePath')));
   }
 }

@@ -19,7 +19,9 @@ class RequestHandler {
   String accessToken = "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";
 
 
-  Future<Map> postData({endPoint, String parma = '', auth = false, required Map<String, dynamic> requestBody}) async {
+  Future<Map> postData({endPoint, String parma = '',
+    auth = false,
+    required Map<String, dynamic> requestBody}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var request = http.Request('POST', Uri.parse(mainUrl + endPoint + parma))
       ..headers.addAll(auth ? {
@@ -100,7 +102,9 @@ class RequestHandler {
     String? filePath,
     String? fieldName,
     String? signaturePath,
-    String? signatureFieldName
+    String? ownerSignaturePath,
+    String? signatureFieldName,
+    String? ownerSignatureFieldName,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String url = mainUrl + endPoint + param;
@@ -129,6 +133,14 @@ class RequestHandler {
       http.MultipartFile signatureFile = await http.MultipartFile.fromPath(
         signatureFieldName!,
         signaturePath,
+      );
+      request.files.add(signatureFile);
+    }
+
+    if (ownerSignaturePath !=null) {
+      http.MultipartFile signatureFile = await http.MultipartFile.fromPath(
+        ownerSignatureFieldName!,
+        ownerSignaturePath,
       );
       request.files.add(signatureFile);
     }
@@ -187,6 +199,42 @@ class RequestHandler {
     } catch (e) {
       print('Error: $e');
       throw Exception('Failed to make the GET request');
+    }
+  }
+
+  Future<void> deleteData({
+    required String endPoint,
+    String param = '',
+    bool auth = false,
+  }) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String url = mainUrl + endPoint + param;
+
+    try {
+      http.Response response;
+
+      if (auth) {
+        response = await http.delete(
+          Uri.parse(url),
+          headers: {
+            "Authorization": "Bearer ${prefs.get('token')}",
+            "Content-Type": "application/json; charset=UTF-8"
+          },
+        );
+      } else {
+        response = await http.delete(Uri.parse(url));
+      }
+      print(prefs.get('token'));
+      if (response.statusCode == 200) {
+        dynamic decodedResponse = json.decode(response.body);
+        print(decodedResponse);
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to make the Delete request');
     }
   }
 

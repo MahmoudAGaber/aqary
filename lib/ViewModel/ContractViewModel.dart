@@ -71,10 +71,10 @@ class ContractMineNotifier extends StateNotifier<StateModel<List<ContractMine>>>
 
   RequestHandler requestHandler = RequestHandler();
 
-  Future<ContractMine?> getOneContract(String contractId,) async{
+  Future<ContractMine?> getOneContract(String contractId) async{
     List<ContractMine> contracts = [];
     List<ContractMine> temp = [];
-    try{
+
       state = StateModel.loading();
      ContractMineResponse contractMineResponse = await requestHandler.getData(
           endPoint: "/contracts/mine",
@@ -92,19 +92,32 @@ class ContractMineNotifier extends StateNotifier<StateModel<List<ContractMine>>>
           print(temp[0]);
           state = StateModel.success(temp);
           return state.data![0];
-    }catch(e){
-      state = StateModel.fail("Error to Send Contract$e");
-    }
+
     return null;
 
   }
 
-  void acceptContract(contractId,String filePath){
+
+  void inviteContract(String propertyId, Map<String, String> data){
+    try{
+      requestHandler.postData(
+          endPoint: "/contracts/$propertyId/invite",
+          auth: true,
+          requestBody: data);
+    }catch(e){
+      print("Error to Send Contract$e");
+    }
+
+  }
+
+  void acceptContract(String ownerSignaturePath,contractId,String filePath){
     try{
       requestHandler.postContract(
           endPoint: "/contracts/$contractId/accept",
           auth: true,
           filePath: filePath,
+          ownerSignaturePath: ownerSignaturePath,
+          ownerSignatureFieldName: 'owner_signature',
           fieldName: 'contract',
           requestBody: {});
     }catch(e){

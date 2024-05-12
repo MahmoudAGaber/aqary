@@ -90,8 +90,7 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                                     padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
                                     child: InkWell(
                                       onTap: (){
-                                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>EstateDetails()));
-
+                                         Navigator.push(context, MaterialPageRoute(builder: (context)=>EstateDetails(propertyId: item.id!,)));
                                       },
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.all(Radius.circular(10)),

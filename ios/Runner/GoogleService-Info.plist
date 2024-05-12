@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyDHVIcCl6SQQLpYBXrOT-01mD8FoEEuVJE</string>
+	<string>AIzaSyBD1DNdow46OiOnjxtn2Vjc12slhCqyAV8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1031324108852</string>
+	<string>1032051706704</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.aqary</string>
 	<key>PROJECT_ID</key>
-	<string>aqary-b9bd4</string>
+	<string>aqary-73d78</string>
 	<key>STORAGE_BUCKET</key>
-	<string>aqary-b9bd4.appspot.com</string>
+	<string>aqary-73d78.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1031324108852:ios:26c800ade2c819ee452261</string>
+	<string>1:1032051706704:ios:bcc6d978d851c95b8d7a55</string>
 </dict>
 </plist>

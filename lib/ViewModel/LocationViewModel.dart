@@ -41,18 +41,22 @@ class EstateLocationNotifier extends StateNotifier<LocationData?> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      print("HIFHJKSDS${position.longitude}");
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
         localeIdentifier: 'ar-SA'
       );
-     placemarks.forEach((element) {print(element.subAdministrativeArea);});
+
+      print("bybybyb${placemarks[0]}");
 
       LocationData locationData = LocationData(
         longtude: position.longitude,
         latitude:  position.latitude,
-        placemark: placemarks.isNotEmpty ? placemarks[3] : null,
+        placemark: placemarks.isNotEmpty ? placemarks[0] : null,
       );
+
+
 
       state = locationData;
 
@@ -76,7 +80,7 @@ class EstateLocationNotifier extends StateNotifier<LocationData?> {
         state = LocationData(
           latitude: point.latitude,
           longtude: point.longitude,
-          placemark: placemarks[3],
+          placemark: placemarks[0],
 
         );
       }
@@ -125,7 +129,7 @@ class UserLocationNotifier extends StateNotifier<LocationData?> {
       LocationData locationData = LocationData(
         longtude: position.longitude,
         latitude:  position.latitude,
-        placemark: placemarks.isNotEmpty ? placemarks[3] : null,
+        placemark: placemarks.isNotEmpty ? placemarks[0] : null,
       );
 
       state = locationData;
@@ -151,7 +155,7 @@ class UserLocationNotifier extends StateNotifier<LocationData?> {
         state = LocationData(
           latitude: point.latitude,
           longtude: point.longitude,
-          placemark: placemarks[3],
+          placemark: placemarks[0],
 
         );
         var city = "${state!.placemark!.country}, ${state!.placemark!.locality}, ${state!.placemark!.administrativeArea}";

@@ -236,22 +236,20 @@ class SearchByLocation {
                                                       itemCount: contriesByRegions.data![0].citiesAndAreas.length,
                                                       shrinkWrap: true,
                                                       itemBuilder: (context,index){
-                                                        print("${contriesByRegions.data!.length}");
                                                         return Padding(
                                                           padding: const EdgeInsets.all(8.0),
-                                                          child: Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Text(contriesByRegions.data![0].citiesAndAreas[index],style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16)),
-                                                              InkWell(
-                                                                onTap: (){
-                                                                  ref.read(RealStateProvider.notifier).state.clear();
-                                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: contriesByRegions.data![0].citiesAndAreas[index],)));
-
-                                                                },
-                                                                child: Icon(Icons.arrow_forward_ios,size: 15,),
-                                                              )
-                                                            ],
+                                                          child: InkWell(
+                                                            onTap: (){
+                                                              ref.read(RealStateProvider.notifier).state.clear();
+                                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>MoreEstates(city: contriesByRegions.data![0].citiesAndAreas[index],)));
+                                                            },
+                                                            child: Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Text(contriesByRegions.data![0].citiesAndAreas[index],style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16)),
+                                                                Icon(Icons.arrow_forward_ios,size: 15,)
+                                                              ],
+                                                            ),
                                                           ),
                                                         );
                                                       },),

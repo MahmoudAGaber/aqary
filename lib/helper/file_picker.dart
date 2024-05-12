@@ -23,7 +23,7 @@ class FilePickerHelper {
         allowMultiple: isOne? false : true,
         type: FileType.custom,
         allowedExtensions: ['jpeg', 'jpg', 'png', 'flv', 'mkv', 'mov', 'mp4', 'mpeg', 'webm', 'wmv'],
-        withData: true
+        withData: true,
     );
     if (result != null) {
       for (var file in result.files) {

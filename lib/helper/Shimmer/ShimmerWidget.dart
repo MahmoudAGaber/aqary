@@ -44,7 +44,7 @@ class ShimmerList extends StatelessWidget {
                   print(time);
 
                   return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      padding: EdgeInsets.symmetric(horizontal: 15,vertical: 4),
                       child: Shimmer.fromColors(
                         highlightColor: Colors.white,
                         baseColor: Colors.grey[350]!,
@@ -84,7 +84,7 @@ class ShimmerLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double containerWidth = MediaQuery.of(context).size.width * .6;
+    double containerWidth = MediaQuery.of(context).size.width * .56;
     double containerHeight = 15;
 
     return type == "Grid"
@@ -95,11 +95,8 @@ class ShimmerLayout extends StatelessWidget {
             ),
           )
         : type == "List"
-            ? Container(
-                margin: EdgeInsets.symmetric(vertical: 7.5),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+            ?  Row(
+                 crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
                       height: 100,
@@ -130,7 +127,7 @@ class ShimmerLayout extends StatelessWidget {
                       ],
                     )
                   ],
-                ))
+                )
             : type == "Banner"
                 ? Container(
                       height: 120,

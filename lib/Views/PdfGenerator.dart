@@ -35,7 +35,7 @@ class PdfInvoiceApi {
     var englishFont = Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
 
 
-    TextStyle textStyle = pw.TextStyle(fontSize: 15);
+    TextStyle textStyle = pw.TextStyle(fontSize: 16);
 
     pdf.addPage(
       pw.Page(
@@ -51,7 +51,7 @@ class PdfInvoiceApi {
               mainAxisAlignment: pw.MainAxisAlignment.start,
               children: [
                 pw.Text("وثــــيــــقة إيــــجــــار",
-                  style: pw.TextStyle(fontSize: 17,font: arabicFontBold,fontStyle: pw.FontStyle.italic),
+                  style: pw.TextStyle(fontSize: 18,font: arabicFontBold,fontStyle: pw.FontStyle.italic),
 
                 ),
 
@@ -222,7 +222,7 @@ class PdfInvoiceApi {
                 ),
                 pw.SizedBox(height: 6),
                 pw.Text("الشروط المتفق عليها كما يلي",
-                  style: pw.TextStyle(fontSize: 17,font: arabicFontBold),
+                  style: pw.TextStyle(fontSize: 18,font: arabicFontBold),
                 ),
                 pw.SizedBox(width: 230,
                   child:  pw.Divider(thickness: .5,color: PdfColors.black),),
