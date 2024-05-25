@@ -8,7 +8,8 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PdfViewer extends StatelessWidget {
   String filePath;
-   PdfViewer({super.key,required this.filePath});
+  bool isUrl;
+   PdfViewer({super.key,required this.filePath,required this.isUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,10 @@ class PdfViewer extends StatelessWidget {
       appBar: CustomAppBar(
         title: "معاينة العقد",
       ),
-        body: SfPdfViewer.file(
-            File('$filePath')));
+        body: isUrl
+            ?SfPdfViewer.network(filePath)
+            :SfPdfViewer.file(
+            File('$filePath'))
+    );
   }
 }

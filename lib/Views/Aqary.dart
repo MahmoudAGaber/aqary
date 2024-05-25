@@ -15,6 +15,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
+import 'PdfViewer.dart';
+
 class Aqary extends ConsumerStatefulWidget {
   const Aqary({super.key});
 
@@ -162,16 +164,21 @@ class _AqaryState extends ConsumerState<Aqary>  with SingleTickerProviderStateMi
                                                       },
 
                                                       itemBuilder: (BuildContext context) => <PopupMenuEntry<SampleItem>>[
-                                                        const PopupMenuItem<SampleItem>(
-                                                          value: SampleItem.itemOne,
-                                                          child: Row(
-                                                            children: [
-                                                              Icon(Icons.view_list_outlined ,size: 18,),
-                                                              SizedBox(width: 6,),
-                                                              Text('معاينة العقد',style: TextStyle(color: Colors.black,fontSize: 15),),
-                                                            ],
-                                                          ),
-                                                        ),
+                                                        //  PopupMenuItem<SampleItem>(
+                                                        //   value: SampleItem.itemOne,
+                                                        //   child: Row(
+                                                        //     children: [
+                                                        //       Icon(Icons.view_list_outlined ,size: 18,),
+                                                        //       SizedBox(width: 6,),
+                                                        //       Text('معاينة العقد',style: TextStyle(color: Colors.black,fontSize: 15),),
+                                                        //     ],
+                                                        //   ),
+                                                        //    onTap: (){
+                                                        //      Navigator.push(
+                                                        //          context,
+                                                        //          MaterialPageRoute(builder: (context) => PdfViewer(filePath: file.path,isUrl: true,)));
+                                                        //    },
+                                                        // ),
                                                         const PopupMenuItem<SampleItem>(
                                                           value: SampleItem.itemTwo,
                                                           child: Row(

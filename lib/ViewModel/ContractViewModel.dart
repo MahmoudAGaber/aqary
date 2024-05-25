@@ -125,6 +125,20 @@ class ContractMineNotifier extends StateNotifier<StateModel<List<ContractMine>>>
     }
 
   }
+
+  // Future<void> updateContract(Map<String, String> data) async {
+  //
+  //   await requestHandler.patch(
+  //     endPoint: "/users/profile",
+  //     requestBody: data,
+  //     fromJson: (json) => Map,
+  //     auth: true,
+  //     file: data['file'],
+  //     fieldName: 'contract'
+  //   );
+  //
+  //
+  // }
 }
 
 class EstatePaymentNotifier extends StateNotifier<PaymentType> {

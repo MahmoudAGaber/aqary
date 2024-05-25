@@ -748,7 +748,7 @@ class _RentState extends ConsumerState<OwnerCTSignature> {
 
                                           Navigator.push(
                                               context,
-                                              MaterialPageRoute(builder: (context) => PdfViewer(filePath: file.path,)));
+                                              MaterialPageRoute(builder: (context) => PdfViewer(filePath: file.path,isUrl: false,)));
                                        });
 
                                       }else{

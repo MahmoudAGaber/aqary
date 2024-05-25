@@ -119,7 +119,7 @@ class _ProfileState extends ConsumerState<Profile> {
                           ),
                         ),
                         SizedBox(height: Dimensions.paddingSizeDefault,),
-                        Text(user.data!.name, style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600)),
+                        Text(user.data!.name, style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600,fontSize: 17)),
                         SizedBox(height: 4,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -128,8 +128,8 @@ class _ProfileState extends ConsumerState<Profile> {
                               user.data!.phone,
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodySmall!
-                                  .copyWith(fontSize: 10),
+                                  .bodyMedium!
+                                  .copyWith(),
                               overflow: TextOverflow.clip,
                               softWrap: true,
                             ),

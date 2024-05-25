@@ -592,6 +592,7 @@ class _AddEstateState extends ConsumerState<AddEstate> {
                                       isAvailable: true,
                                       isFavorite: false
                                   );
+                                  ref.read(PromoProvider.notifier).getPromo();
                                   Distinction().distinctionEstate(context,realStateModel,);
                                 }
           

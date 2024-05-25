@@ -86,9 +86,9 @@ class _RentState extends ConsumerState<Rent> {
 
     int months = (endDate.year - startDate.year) * 12 + endDate.month - startDate.month;
 
-    if (endDate.day < startDate.day) {
-      months--;
-    }
+    // if (endDate.day < startDate.day) {
+    //   months--;
+    // }
 
     return months;
   }
@@ -255,7 +255,7 @@ class _RentState extends ConsumerState<Rent> {
                               height: Dimensions.paddingSizeSmall,
                             ),
                             TextFormField(
-                              enabled: false,
+                              //enabled: false,
                               controller: ownerEstateEditingController,
                               textDirection: ui.TextDirection.rtl,
                               cursorColor: Colors.grey,
@@ -657,8 +657,8 @@ class _RentState extends ConsumerState<Rent> {
                         controller: noteEditingController,
                         textDirection: ui.TextDirection.rtl,
                         cursorColor: Colors.grey,
-                        maxLines: 2,
-                        style: TextStyle(color: Colors.black),
+                        maxLines: 3,
+                        style: TextStyle(color: Colors.black,fontSize: 15),
                         decoration: InputDecoration(
                             fillColor: Color(0xFFF9FAFA),
                             filled: true,
@@ -725,7 +725,7 @@ class _RentState extends ConsumerState<Rent> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => PdfViewer(filePath: file.path,)));
+                                      builder: (context) => PdfViewer(filePath: file.path,isUrl: false,)));
                             }else{
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("من فضلك قم بإضة التوقيع الخاص بك",style: TextStyle(color: Colors.black),)));
 

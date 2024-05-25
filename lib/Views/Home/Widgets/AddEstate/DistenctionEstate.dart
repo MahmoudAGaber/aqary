@@ -34,7 +34,6 @@ class Distinction {
       builder: (BuildContext context) {
         return Consumer(
             builder: (context, ref, child) {
-              ref.read(PromoProvider.notifier).getPromo();
               var promos = ref.watch(PromoProvider);
               return WillPopScope(
                 onWillPop: () async {
@@ -280,16 +279,30 @@ class _PaySampleAppState extends State<PaySampleApp> {
   @override
   void initState() {
     super.initState();
-    _googlePayConfigFuture =
-        PaymentConfiguration.fromAsset('default_google_pay_config.json');
+    _googlePayConfigFuture = PaymentConfiguration.fromAsset('default_google_pay_config.json');
   }
 
   void onGooglePayResult(paymentResult) {
-    debugPrint(paymentResult.toString());
+  if (paymentResult != null && paymentResult['token'] != null) {
+  final String token = paymentResult['token'];
+  debugPrint("Transaction successful. Token: $token");
+  // Handle the successful transaction, e.g., send the token to your server
+  } else {
+  // Handle failure scenario
+  debugPrint("Transaction failed or token not received. Result: $paymentResult");
+  }
+
   }
 
   void onApplePayResult(paymentResult) {
-    debugPrint(paymentResult.toString());
+    if (paymentResult != null && paymentResult['token'] != null) {
+      final String token = paymentResult['token'];
+      debugPrint("Transaction successful. Token: $token");
+      // Handle the successful transaction, e.g., send the token to your server
+    } else {
+      // Handle failure scenario
+      debugPrint("Transaction failed or token not received. Result: $paymentResult");
+    }
   }
 
   @override

@@ -37,8 +37,12 @@ class PdfInvoiceApi {
 
     TextStyle textStyle = pw.TextStyle(fontSize: 16);
 
+    final PdfPageFormat customPageFormat = PdfPageFormat(500, 1080);
+
+
     pdf.addPage(
       pw.Page(
+        pageFormat: customPageFormat ,
         margin: EdgeInsets.only(left: 18,right: 18,top: 12),
         theme: ThemeData.withFont(
           base: englishFont,
@@ -139,7 +143,7 @@ class PdfInvoiceApi {
                       ),
                       pw.Paragraph(
                           text: titleRent.isNotEmpty || titleRent!=null ? " $titleRent " :'-------------------------------------------',
-                          style: textStyle.copyWith(font: englishFont),
+                          style: textStyle.copyWith(font: PaymentHelper.containsEnglish(ownerName) ? englishFont:arabicFont,),
                           padding: EdgeInsets.zero,
                           margin: EdgeInsets.zero
                       ),
@@ -362,6 +366,7 @@ class PdfInvoiceApi {
           );
         },
       ),
+
     );
 
     return FileHandleApi.saveDocument(name: 'my_invoice.pdf', pdf: pdf);

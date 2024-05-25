@@ -26,44 +26,16 @@ class SplachScreen extends ConsumerStatefulWidget {
 class _SplachScreenState extends ConsumerState<SplachScreen> {
 
 
-  Future<void> requestPermissions() async {
-    var status = await Permission.locationAlways.status;
-    if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
-      // Request permissions
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.locationAlways,
-      ].request();
-      if (statuses[Permission.locationAlways]?.isGranted ?? false) {
-        // Permission is granted, proceed
-        getLocations();
-      } else {
-        // Handle the case when permission is denied
-        _handlePermissionDenied();
-      }
-    } else if (status.isGranted) {
-      // Permission is already granted, proceed
-      getLocations();
-    }
-  }
 
-  void _handlePermissionDenied() {
-    // Logic to handle when the user denies the permission
-  }
-
-  Future<void> getLocations()async{
-    await  ref.watch(estatelocationProvider.notifier).getCurrentEstateLocation();
-    await  ref.watch(userLocationProvider.notifier).getCurrentUserLocation();
-  }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       var auth =  ref.watch(authStateProvider.future);
-      AddressHelper.checkPermission(getLocations);
       Timer(Duration(seconds: 3), () async{
 
-
-       // requestPermissions();
+        await  ref.watch(estatelocationProvider.notifier).getCurrentEstateLocation();
+        await  ref.watch(userLocationProvider.notifier).getCurrentUserLocation();
 
        auth.then((user) {
           user != null

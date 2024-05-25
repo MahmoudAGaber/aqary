@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
   import 'package:easy_localization/easy_localization.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 
@@ -24,16 +27,39 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   );
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  runApp(
-      ProviderScope(
-      child: EasyLocalization(
-        supportedLocales: [Locale("ar", "AR"), Locale("en", "US")],
-          path: "assets/language",
-          startLocale: Locale("ar","AR"),
-          fallbackLocale: Locale("en", "US"),
-          saveLocale: true,
-          child: const MyApp())));
+
+  requestLocationPermission().then((value){
+    runApp(
+        ProviderScope(
+            child: EasyLocalization(
+                supportedLocales: [Locale("ar", "AR"), Locale("en", "US")],
+                path: "assets/language",
+                startLocale: Locale("ar","AR"),
+                fallbackLocale: Locale("en", "US"),
+                saveLocale: true,
+                child: const MyApp())));
+  });
 }
+
+Future<void> requestLocationPermission() async {
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return;
+    }
+  }
+
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await Geolocator.openLocationSettings();
+    if (!serviceEnabled) {
+      return;
+    }
+  }
+}
+
+
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});

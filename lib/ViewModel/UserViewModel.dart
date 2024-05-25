@@ -70,7 +70,6 @@ class UserNotifier extends StateNotifier<StateModel<UserModel>> {
       };
     }
 
-
      // state = StateModel.loading();
         await requestHandler.patch(
           endPoint: "/users/profile",
@@ -80,11 +79,7 @@ class UserNotifier extends StateNotifier<StateModel<UserModel>> {
          file: user['pic']??File(""),
       );
 
-
      // state = StateModel.success(userModel);
-
-
-
 
   }
 
@@ -167,9 +162,6 @@ class ManagedEstatesNotifier extends StateNotifier<StateModel<ManagedEstateModel
       await requestHandler.deleteData(
         endPoint: "/contracts/$contractId",
         auth: true,);
-
-
-
   }
 
   dynamic rentAmount(List<Manage> managedEstates){
