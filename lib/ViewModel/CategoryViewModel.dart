@@ -6,6 +6,7 @@ import 'package:aqary/data/StateModel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../Models/BanerModel.dart';
+import 'FavoritesViewModel.dart';
 import 'LocationViewModel.dart';
 
 
@@ -60,6 +61,8 @@ class CategoryNotifier extends StateNotifier<StateModel<List<CategoryModel>>>{
         for(var pro in item.properties){
           if(pro.id == id){
             pro.isFavorite = !pro.isFavorite;
+            ref.read(favoritesProvider.notifier).addFavorite(pro);
+
             print("WELLDONE");
           }
         }
@@ -137,10 +140,18 @@ class nearByNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
 
       for(var item in realEstateTemp){
           if(item.id == id){
-            item.isFavorite = !item.isFavorite;
-            print("WELLDONE");
-          }
+            if(item.isFavorite){
+              item.isFavorite = false;
+              print(item.id);
+              await ref.read(favoritesProvider.notifier).removeFavorite(item.id!);
+              print("DELETED");
+            }else{
+              item.isFavorite = true;
+              await ref.read(favoritesProvider.notifier).addFavorite(item);
+              print("Added");
 
+            }
+          }
 
       }
       state = StateModel.success(realEstateTemp);

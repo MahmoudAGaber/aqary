@@ -96,4 +96,18 @@ class FavoritesNotifier extends StateNotifier<StateModel<List<RealStateModel>>>{
       print("ErrorToAddToFavorites$e");
     }
   }
+
+  Future<void> addFavorite(RealStateModel realStateModel)async {
+    List<RealStateModel> realEstateTemp = [];
+
+    if(state.data != null){
+      realEstateTemp = [...state.data!, realStateModel];
+    }else{
+      realEstateTemp = [realStateModel];
+
+    }
+
+    state = StateModel.success(realEstateTemp);
+  }
+
 }

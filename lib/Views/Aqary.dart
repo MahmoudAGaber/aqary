@@ -141,13 +141,13 @@ class _AqaryState extends ConsumerState<Aqary>  with SingleTickerProviderStateMi
                                                   ),
                                                   Flexible(
                                                       flex: 4,
-                                                      child: Center(child: Text("${DateConverter.numberFormat(item.rent)}",style: Theme.of(context).textTheme.titleSmall,))),
+                                                      child: Center(child: Text("${DateConverter.numberFormat(item.rent?? 0)}",style: Theme.of(context).textTheme.titleSmall,))),
                                                   Flexible(
                                                       flex: 3,
-                                                      child: Center(child: Text("${DateConverter.numberFormat(item.monthly)}",style: Theme.of(context).textTheme.titleSmall,))),
+                                                      child: Center(child: Text("${DateConverter.numberFormat(item.monthly ?? 0)}",style: Theme.of(context).textTheme.titleSmall,))),
                                                   Flexible(
                                                       flex: 3,
-                                                      child: Center(child: Text("${DateConverter.numberFormat(item.paid)}",style: Theme.of(context).textTheme.titleSmall,))),
+                                                      child: Center(child: Text("${DateConverter.numberFormat(item.paid ?? 0)}",style: Theme.of(context).textTheme.titleSmall,))),
                                                   Flexible(
                                                     flex: 2,
                                                     child:PopupMenuButton<SampleItem>(

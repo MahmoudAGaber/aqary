@@ -176,7 +176,8 @@ class ManagedEstatesNotifier extends StateNotifier<StateModel<ManagedEstateModel
     dynamic total = 0;
     if(managedEstates.isNotEmpty){
       for(var item in managedEstates){
-        total += item.monthly;
+        print("OKLETSGOBABY${item.monthly}");
+        total += item.monthly ?? 0;
       }
     }
     return total;

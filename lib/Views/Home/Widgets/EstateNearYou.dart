@@ -163,7 +163,6 @@ class _EstateNearYouState extends ConsumerState<EstateNearYou> {
                                   borderRadius: BorderRadius.circular(50),
                                   onTap: (){
                                     ref.read(nearByProvider.notifier).addFavorite(item.id!);
-
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(

@@ -47,7 +47,8 @@ post_install do |installer|
         '$(inherited)',
         'AUDIO_SESSION_MICROPHONE=0'
       ]
-    end
+      end
+
 
   end
 end
